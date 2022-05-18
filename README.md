@@ -2,7 +2,7 @@
 
 #Status: Working.
 
-#Help: Reachout to pawansi@cisco.com
+#Help: pawansi@cisco.com
 
 Topology reference: https://www.cisco.com/c/dam/en/us/td/i/300001-400000/350001-360000/354001-355000/354879.eps/_jcr_content/renditions/354879.jpg
 
@@ -25,6 +25,7 @@ Topology:
                \\                 --------------------------        //
                 \\================|                        |=======//
                                   |  Distribution          |
+                                  | StackWise-Virtual      |
                                   |------------------------|
 
     Each Dual Active Detection must have "DAD-LINK" keyword in link description text
@@ -43,30 +44,33 @@ Topology:
 #Code Checkout:
 Checkout the code with git or download from github directly.
 ```bash
-   git clone git@github.com:kpawans/Cat9KStackwiseVirtualUserLib.git
-   cd Cat9KStackwiseVirtualUserLib
+   git clone git@github.com:DNACENSolutions/Stackwise-Virtual.git
+   cd Stackwise-Virtual
 ```
 #to run the setup installer:
 ```bash
-   ./setup.sh
+   ./stackwisevirtual.sh -i install
 
-   #source your python/pyats env
-   source pythonenv/bin/activate
 ```
 
 Create or Setup your testbed yaml file for the switch pair to be used for creating stackwise-virtual. Refer sample file: testbed/9600_sv_tb.yaml
 
 #Running scripts
 ```bash
-   pyats run job <joblocation> --testbed <testbedlocation>
+    ./stackwisevirtual.sh -<option>  <testbedlocation>
 ```
 #Launch your svlbuilder script.
 ```bash
-   pyats run job job/svl_job.py --testbed ./testbed/9600_sv_tb.yaml
+   ./stackwisevirtual.sh -c ./testbed/9600_sv_tb.yaml
 ```
 #to Cleanup svlconfig from svl pair
 ```bash
-   pyats run job job/svl_remove_job.py --testbed ./testbed/9600_sv_tb.yaml
+  ./stackwisevirtual.sh -d ./testbed/9600_sv_tb.yaml
+```
+
+#to update stackwise-virtual links or dual-active detection link configs.
+```bash
+  ./stackwisevirtual.sh -u ./testbed/9600_sv_tb.yaml
 ```
 
 #To use this as a library:
