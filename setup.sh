@@ -92,18 +92,19 @@ echo "Please answer the following prompts."
 echo "(Blank responses will use the default values)"
 echo
 # Prompt for PyATS venv
-while true; do
-    echo "Please specifiy where the PyATS virtual environment will be installed:"
-    read -p "(default: './pyatsenv') > " opt_install
-    opt_install=${opt_install:-${DEFAULT_VENV}}     # Set default
-    opt_install=${opt_install/#\~/${HOME}}          # Expand '~' if at front
-    if [[ -d "${opt_install}" ]]; then
-        if ! confirm "This directory already exists and will be replaced.  Are you sure?"; then
-            continue
-        fi
-    fi
-    break
-done
+#while true; do
+#    echo "Please specifiy where the PyATS virtual environment will be installed:"
+#    read -p "(default: './pyatsenv') > " opt_install
+#    opt_install=${opt_install:-${DEFAULT_VENV}}     # Set default
+#    opt_install=${opt_install/#\~/${HOME}}          # Expand '~' if at front
+#    if [[ -d "${opt_install}" ]]; then
+#        if ! confirm "This directory already exists and will be replaced.  Are you sure?"; then
+#            continue
+#        fi
+#    fi
+#    break
+#done
+opt_install=${opt_install:-${DEFAULT_VENV}}     # Set default
 
 # Confirm settings
 echo "Starting with the following settings:"
