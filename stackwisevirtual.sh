@@ -29,7 +29,7 @@ Help()
 echo
 echo "Stackwise Virtual:"
 
-while getopts ":hicud:" option; do
+while getopts ":h:i:c:u:d:" option; do
    case $option in
       h) # display Help
          Help
