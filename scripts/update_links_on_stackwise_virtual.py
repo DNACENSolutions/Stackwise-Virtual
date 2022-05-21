@@ -118,29 +118,30 @@ class svlformation_and_validation(aetest.Testcase):
         result=True
         for stackpair in svl_handle.device_pair_list:
             with steps.start("Stackwise Virtual config") as step:
-                if not svl_handle.default_svl_dad_interfaces(stackpair['stackwiseVirtualDev']):
-                    result=False
-                    step.failed("Step1 Default Existing interface configs")
-                
-                if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
-                    result=False
-                    step.failed("Step2 Save config and reload the switches, failed")
+                if stackpair["status"]:
+                    if not svl_handle.default_svl_dad_interfaces(stackpair['stackwiseVirtualDev']):
+                        result=False
+                        step.failed("Step1 Default Existing interface configs")
+                    
+                    if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
+                        result=False
+                        step.failed("Step2 Save config and reload the switches, failed")
 
-                if not svl_handle.configure_svl_step2_svllinkconfig(stackpair):
-                    result=False
-                    step.failed("Step3 Config stackwise Virtual links on switches, failed.")
+                    if not svl_handle.configure_svl_step2_svllinkconfig(stackpair):
+                        result=False
+                        step.failed("Step3 Config stackwise Virtual links on switches, failed.")
 
-                if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
-                    result=False
-                    step.failed("Step4 Save config and reload the switches, failed")
+                    if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
+                        result=False
+                        step.failed("Step4 Save config and reload the switches, failed")
 
-                if not svl_handle.configure_svl_step3_dad_linkconfig(stackpair):
-                    result=False
-                    step.failed("Step5 Configuring stackwise Virtual Dual Active Detection Links, failed.")
+                    if not svl_handle.configure_svl_step3_dad_linkconfig(stackpair):
+                        result=False
+                        step.failed("Step5 Configuring stackwise Virtual Dual Active Detection Links, failed.")
 
-                if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
-                    result=False
-                    step.failed("Step6 Save config and reload the switches, failed.")
+                    if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
+                        result=False
+                        step.failed("Step6 Save config and reload the switches, failed.")
         if not result:
             self.failed("Stackwise Virtual configuration failed on one or more switches. ", goto = ['common_cleanup'])
         else:
