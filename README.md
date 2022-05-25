@@ -11,17 +11,17 @@ Topology reference: https://www.cisco.com/c/dam/en/us/td/i/300001-400000/350001-
 Topology:
        ||====================Fusion Router=====================================||
        ||                                                                      ||
-       ||    (MultiChassi Linkgroup with PAGP/LACP)                            ||
+       ||    (MultiChassis Linkgroup)                                          ||
        ||                                                                      ||
    |-------|                                                               |-------|
    |       |--------Dual Active Detection Link (DAD-LINK)------------------|       |
    |       |                                                               |       |
-   |Switch1|----------Stackwise-Virtual link (STACKWISEVIRTUAL-LINK)-------|Switch2|         [Stackwise-Virtual Switch (9500/9600/9400) Gateway (SEED)]
+   |Switch1|----------Stackwise-Virtual link (STACKWISEVIRTUAL-LINK)-------|Switch2|      [Stackwise-Virtual Switch (9400/9500/9500H/9600/) Gateway (SEED)]
    |       |----------Stackwise-Virtual link (STACKWISEVIRTUAL-LINK)-------|       |
    |-------|\                                                           // |-------|
             \\                                                         //
              \\                                                       //
-      (MultiChassi Linkgroup with PAGP/LACP)                         //
+      (MultiChassis Linkgroup)                                       //
                \\                 --------------------------        //
                 \\================|                        |=======//
                                   |  Distribution          |
