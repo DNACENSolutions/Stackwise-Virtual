@@ -21,7 +21,7 @@ import logging
 from pyats import aetest
 # create a logger for this module
 Logger = logging.getLogger(__name__)
-from svlservices.svlservice import StackWiseVirtual
+from svlservices.svlservices import StackWiseVirtual
 from pyats.aetest.steps import Steps
 
 class CommonSetup(aetest.CommonSetup):

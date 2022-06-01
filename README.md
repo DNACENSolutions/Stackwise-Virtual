@@ -75,7 +75,7 @@ Create or Setup your testbed yaml file for the switch pair to be used for creati
 
 #To use this as a library:
 ```bash
-   from svlservices.svlservice import StackWiseVirtual
+   from svlservices.svlservices import StackWiseVirtual
    svl_handle = StackWiseVirtual(testbed)
 ```
 

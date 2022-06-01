@@ -48,7 +48,7 @@ devices:
                 port: 2003
                 arguments:
                     learn_hostname: True
-            #if it is a dual RP device Define the secon console under b:
+            #if it is a dual RP device Define the second console under b:
             #b:
             #    protocol: telnet
             #    ip: 172.21.236.76
