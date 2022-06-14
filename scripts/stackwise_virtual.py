@@ -26,7 +26,7 @@ from pyats.aetest.steps import Steps
 
 class CommonSetup(aetest.CommonSetup):
     @aetest.subsection
-    def commonsetup_initialize_testbed(self, testbed):
+    def commonsetup_initialize_testbed(self, testbed, svlPair=None):
         '''
             Establishes connection to all your testbed devices.
         '''
@@ -36,23 +36,13 @@ class CommonSetup(aetest.CommonSetup):
         #initilize StackWiseVirtual Class
         svl_handle = StackWiseVirtual(testbed)
         Logger.info(svl_handle)
+        svl_handle.get_device_pairs(svlPair=svlPair)
         self.parent.parameters['svl_handle'] = svl_handle
 
 class svlformation_and_validation(aetest.Testcase):
     '''svlformation
         The Testcase configure the Stackwise Virtual conifg on two switches provided in the testbed yaml.
     '''
-
-    # testcase groups (uncomment to use)
-    # groups = []
-
-    @aetest.setup
-    def setup_make_svl_pairs_from_testbed_input(self,svl_handle):
-        '''
-            This is to make SVL logical pair for further tests from testbed yaml inputfile.
-        '''
-        svl_handle.get_device_pairs()
-
     @aetest.test
     def test_pre_check_stackwise_virtual_links(self,svl_handle):
         '''
@@ -96,12 +86,12 @@ class svlformation_and_validation(aetest.Testcase):
         steps = Steps()
         result=True
         for stackpair in svl_handle.device_pair_list:
-            with steps.start("Platform and Version req precheck",continue_= True) as step:
+            with steps.start("Existing SVL Check, Platform and Version req precheck",continue_= True) as step:
                 if not svl_handle.check_min_version_req(stackpair):
                     result=False
-                    step.failed("Minimum Version and Stack status failed for switchpair:{}, fix it before moving further".format(stackpair))
+                    step.failed("Existing SVL Check/Minimum Version/Stack status failed for switchpair:{}, fix it before moving further".format(stackpair))
         if not result:
-            self.failed("Minimum Version and Platform check failed. Fix it before rerun, run remove_stackwise_virtual.py to cleanup existing config", goto = ['common_cleanup'])
+            self.failed("Existing SVL Check/Minimum Version/Stack check failed. Fix it before rerun, run remove_stackwise_virtual.py to cleanup existing config", goto = ['common_cleanup'])
 
     @aetest.test
     def test_configure_stackwise_virtual_configs_bringup_stackwiseVirtual(self,svl_handle):

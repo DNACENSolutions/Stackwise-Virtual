@@ -76,7 +76,7 @@ class StackWiseVirtual(object):
         self.testbed=testbed
         self.device_pair_list=[]
 
-    def get_device_pairs(self):
+    def get_device_pairs(self, svlPair=None):
         '''
             USAGES: This function 
                     1. From the yaml input file, identify the stackpair member. 
@@ -86,40 +86,78 @@ class StackWiseVirtual(object):
             Returns: True if success, False if Fails
         '''
         for pair in self.testbed.custom['switchstackinggroups']:
-            if pair["numberofswitches"] != len(pair["switchs"]): 
-                Logger.error(
-                    "Testbed File Validation Error: The number of devices {}, an count devices provided {} does not match".format(
-                                pair["numberofswitches"],pair["switchs"]))
-                raise
-            dev_stack={}
-            count=1
-            for switch in pair["switchs"]:
-                dev_stack["switch{}".format(count)] = switch
-                count=count+1
-                dev_stack['pairinfo'] = pair
-            dev_stack['stackwiseVirtualDev'] =  Device(name=self.testbed.devices[dev_stack["switch1"]].name+"svl",
-                        type=self.testbed.devices[dev_stack["switch1"]].type,
-                        os=self.testbed.devices[dev_stack["switch1"]].os,
-                        testbed=self.testbed.devices[dev_stack["switch1"]].testbed,
-                        passwords=self.testbed.devices[dev_stack["switch1"]].passwords,
-                        credentials=self.testbed.devices[dev_stack["switch1"]].credentials,
-                        tacacs=self.testbed.devices[dev_stack["switch1"]].tacacs,
-                        custom=self.testbed.devices[dev_stack["switch1"]].custom,
-                        connections=self.testbed.devices[dev_stack["switch1"]].connections)
-            for key in list(self.testbed.devices[dev_stack["switch2"]].connections.keys()):
-                if key in SKIPCONLIST:
-                    continue
-                else:
-                    for k in CONNECTIONKEYS:
-                        if k in list(self.testbed.devices[dev_stack["switch1"]].connections.keys()):
+            if not svlPair:
+                if pair["numberofswitches"] != len(pair["switchs"]): 
+                    Logger.error(
+                        "Testbed File Validation Error: The number of devices {}, an count devices provided {} does not match".format(
+                                    pair["numberofswitches"],pair["switchs"]))
+                    raise
+                dev_stack={}
+                count=1
+                for switch in pair["switchs"]:
+                    dev_stack["switch{}".format(count)] = switch
+                    count=count+1
+                    dev_stack['pairinfo'] = pair
+                dev_stack['stackwiseVirtualDev'] =  Device(name=self.testbed.devices[dev_stack["switch1"]].name+"svl",
+                            type=self.testbed.devices[dev_stack["switch1"]].type,
+                            os=self.testbed.devices[dev_stack["switch1"]].os,
+                            testbed=self.testbed.devices[dev_stack["switch1"]].testbed,
+                            passwords=self.testbed.devices[dev_stack["switch1"]].passwords,
+                            credentials=self.testbed.devices[dev_stack["switch1"]].credentials,
+                            tacacs=self.testbed.devices[dev_stack["switch1"]].tacacs,
+                            custom=self.testbed.devices[dev_stack["switch1"]].custom,
+                            connections=self.testbed.devices[dev_stack["switch1"]].connections)
+                for key in list(self.testbed.devices[dev_stack["switch2"]].connections.keys()):
+                    if key in SKIPCONLIST:
+                        continue
+                    else:
+                        for k in CONNECTIONKEYS:
+                            if k in list(self.testbed.devices[dev_stack["switch1"]].connections.keys()):
+                                continue
+                            else:
+                                dev_stack['stackwiseVirtualDev'].connections[k] = self.testbed.devices[dev_stack["switch2"]].connections[key]
+                                break
+
+                Logger.info(dev_stack['stackwiseVirtualDev'].connections)
+                dev_stack["status"] = False
+                self.device_pair_list.append(dev_stack)
+            else:
+                if svlPair == pair:
+                    if pair["numberofswitches"] != len(pair["switchs"]): 
+                        Logger.error(
+                            "Testbed File Validation Error: The number of devices {}, an count devices provided {} does not match".format(
+                                        pair["numberofswitches"],pair["switchs"]))
+                        raise
+                    dev_stack={}
+                    count=1
+                    for switch in pair["switchs"]:
+                        dev_stack["switch{}".format(count)] = switch
+                        count=count+1
+                        dev_stack['pairinfo'] = pair
+                    dev_stack['stackwiseVirtualDev'] =  Device(name=self.testbed.devices[dev_stack["switch1"]].name+"svl",
+                                type=self.testbed.devices[dev_stack["switch1"]].type,
+                                os=self.testbed.devices[dev_stack["switch1"]].os,
+                                testbed=self.testbed.devices[dev_stack["switch1"]].testbed,
+                                passwords=self.testbed.devices[dev_stack["switch1"]].passwords,
+                                credentials=self.testbed.devices[dev_stack["switch1"]].credentials,
+                                tacacs=self.testbed.devices[dev_stack["switch1"]].tacacs,
+                                custom=self.testbed.devices[dev_stack["switch1"]].custom,
+                                connections=self.testbed.devices[dev_stack["switch1"]].connections)
+                    for key in list(self.testbed.devices[dev_stack["switch2"]].connections.keys()):
+                        if key in SKIPCONLIST:
                             continue
                         else:
-                            dev_stack['stackwiseVirtualDev'].connections[k] = self.testbed.devices[dev_stack["switch2"]].connections[key]
-                            break
+                            for k in CONNECTIONKEYS:
+                                if k in list(self.testbed.devices[dev_stack["switch1"]].connections.keys()):
+                                    continue
+                                else:
+                                    dev_stack['stackwiseVirtualDev'].connections[k] = self.testbed.devices[dev_stack["switch2"]].connections[key]
+                                    break
 
-            Logger.info(dev_stack['stackwiseVirtualDev'].connections)
-            dev_stack["status"] = False
-            self.device_pair_list.append(dev_stack)
+                    Logger.info(dev_stack['stackwiseVirtualDev'].connections)
+                    dev_stack["status"] = False
+                    self.device_pair_list.append(dev_stack)
+                    break
 
     def get_device_version(self, dev):
         '''

@@ -28,7 +28,7 @@ from pyats.aetest.steps import Steps
 class CommonSetup(aetest.CommonSetup):
 
     @aetest.subsection
-    def connect(self, testbed):
+    def connect(self, testbed,svlPair=None):
         '''
         establishes connection to all your testbed devices.
         '''
@@ -38,20 +38,16 @@ class CommonSetup(aetest.CommonSetup):
         #initilize StackWiseVirtual Class
         svl_handle = StackWiseVirtual(testbed)
         Logger.info(svl_handle)
+        Logger.info("Initializing Stackpair Handle: {}".format(svlPair))
+        svl_handle.get_device_pairs(svlPair=svlPair)
         self.parent.parameters['svl_handle'] = svl_handle
+
 
 class svl_config_removal(aetest.Testcase):
     '''svl_config_removal
         1. This testcase remove preconfigured svl configs of stackwose virtual switch.
         2. Validate that the configs are removed from both the switches.
     '''
-
-    # testcase groups (uncomment to use)
-    # groups = []
-
-    @aetest.setup
-    def setup(self,svl_handle):
-        svl_handle.get_device_pairs()
 
     # you may have N tests within each testcase
     # as long as each bears a unique method name

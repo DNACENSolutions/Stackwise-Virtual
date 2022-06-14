@@ -35,7 +35,7 @@ testbed:
 #Devices access details
 #Specify switchpriority and Switchnmber if need to be different. or leave default.
 devices:
-    #Switch1 Details.
+#================================SVL1 Switch Pair===========
     SWITCH-1:
         os: 'iosxe'
         type: 'IOS-XE'
@@ -79,7 +79,7 @@ devices:
                 arguments:
                     learn_hostname: True
 
-
+#================================SVL2 Switch Pair===========
     SWITCH-3:
         os: 'iosxe'
         type: 'IOS-XE'
@@ -131,6 +131,7 @@ devices:
 #                                                                    --> for switch2 2/1/0/48
 #===================================================================================================
 topology:
+#==================================SVL1================
   SWITCH-1:
     interfaces:
       TwentyFiveGigE1/1/0/48:
@@ -153,7 +154,7 @@ topology:
       TwentyFiveGigE2/1/0/31:
         link: STACKWISEVIRTUAL-LINK-2
         type: ethernet
-
+#================================SVL2 Topology===========
   SWITCH-3:
     interfaces:
       TenGigabitEthernet1/0/24:

@@ -23,15 +23,32 @@ __credits__ = ['list', 'of', 'credit']
 __version__ = 1.0
 
 import os
+import time
 from pyats.easypy import run
-
+from pyats.easypy import Task
 # compute the script path from this location
 SCRIPT_PATH = os.path.dirname("./")
-
+MAX_TASK_WAIT_TIME=3600
 def main(runtime):
     '''job file entrypoint'''
-    
-    # run script
-    run(testscript= os.path.join(SCRIPT_PATH, 
-                                 'scripts/update_links_on_stackwise_virtual.py'),
-        runtime = runtime)
+    print(runtime.testbed)
+    if "switchstackinggroups" not in runtime.testbed.custom.keys():
+        print("switchstackinggroups infor is missing in the testbed")
+        return False
+    job_list=[]
+    script_name = os.path.join(SCRIPT_PATH,'scripts/update_links_on_stackwise_virtual.py')
+    for svlPair in runtime.testbed.custom['switchstackinggroups']:
+        print(svlPair)
+        task1 = Task(testscript = script_name,
+                        runtime=runtime,
+                        svlPair=svlPair,
+                        taskid = 'SVLTask-{}-{}:{}'.format(script_name.split('/')[-1],svlPair["platformType"],svlPair["switchs"]))
+        job_list.append(task1)
+        # start the task
+        task1.start()
+        time.sleep(1)
+
+    # wait for a max runtime of 60*5 seconds = 5 minutes
+    for task1 in job_list:
+        result = task1.wait(MAX_TASK_WAIT_TIME)
+        print(result)

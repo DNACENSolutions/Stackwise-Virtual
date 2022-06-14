@@ -26,7 +26,7 @@ from pyats.aetest.steps import Steps
 
 class CommonSetup(aetest.CommonSetup):
     @aetest.subsection
-    def commonsetup_initialize_testbed(self, testbed):
+    def commonsetup_initialize_testbed(self, testbed,svlPair=None):
         '''
             Establishes connection to all your testbed devices.
         '''
@@ -36,23 +36,13 @@ class CommonSetup(aetest.CommonSetup):
         #initilize StackWiseVirtual Class
         svl_handle = StackWiseVirtual(testbed)
         Logger.info(svl_handle)
+        svl_handle.get_device_pairs(svlPair=svlPair)
         self.parent.parameters['svl_handle'] = svl_handle
 
 class svlformation_and_validation(aetest.Testcase):
     '''svlformation
         The Testcase configure the Stackwise Virtual conifg on two switches provided in the testbed yaml.
     '''
-
-    # testcase groups (uncomment to use)
-    # groups = []
-
-    @aetest.setup
-    def setup_make_svl_pairs_from_testbed_input(self,svl_handle):
-        '''
-            This is to make SVL logical pair for further tests from testbed yaml inputfile.
-        '''
-        svl_handle.get_device_pairs()
-
     @aetest.test
     def test_pre_check_stackwise_virtual_links(self,svl_handle):
         '''
