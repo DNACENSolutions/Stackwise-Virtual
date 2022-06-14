@@ -7,6 +7,8 @@ import time
 from unicon.eal.dialogs import Statement, Dialog
 from pyats.topology import Device
 import traceback
+from unicon.utils import Utils as unicon_utils
+
 #=================================Global Constants=====
 SVLVERSION_9500="16.8.1"
 SVLVERSION_9400="16.9.1"
@@ -45,6 +47,103 @@ DIALOG_CONFIRM1 =  Dialog([
                   action="sendline(y)",
                   loop_continue=True,
                   continue_timer=False)])
+#===============Internal Functions======================
+#==========================================================
+# clear console line for dev 
+#==========================================================
+#==========================================================
+# connect with clear line if needed 
+#==========================================================
+def uni_connect(dev, retry=2, wait_sec=1, config_timeout=120):
+    '''
+    Function: uni_connect 
+    Description: Function used to connect to the device through cosole line with device details provided in testbed file.
+                    If connection to console fail, it tries to clear the console line and reconnect on more time.
+    Inputs: Device object
+            retry count, Default 2
+            Wait_sec between retries, Default 1
+            Max config_timeout, Default 120
+    '''
+    result = False
+    import copy
+
+    for run in range(retry): 
+        try:
+            dev.connect(prompt_recovery=True)
+            dev.configure.timeout = config_timeout
+            result = True
+            break
+        except ConnectionError as e:
+            logger.warning("Failed login through primary , trying clearing console and retry")
+            try:
+                uni_clear_console(dev)
+                dev.disconnect()
+                time.sleep(wait_sec)
+            except:
+                logger.error(traceback.format_exc())
+                logger.info("clearing line for try:{}/{}".format(run+1, retry))
+                uni_clear_console(dev)
+                dev.disconnect()
+                time.sleep(wait_sec)
+        if result:
+            break
+    return result
+
+def uni_clear_console(dev):
+    '''
+        Function: uni_clear_console
+        Description: Function to clear console line for a device.
+        If console user/Pass is configured in the terminal server, then con_credebtials need to be provided in TB
+        Under device connections as below.
+
+        con_credentials:
+                terminal_server_username: <tsusername>
+                terminal_server_password: <tspassword>
+                terminal_server_enable_password: <tsenablepass>
+    '''
+    uu = unicon_utils()
+    starts = []
+    if dev.start:
+        starts = [dev.start]
+    elif dev.subconnections:
+        for p in dev.subconnections:
+            starts.append(p.start)
+
+    for start in starts:
+        for console in start:
+            if len(console.split()) == 3:
+                if 'telnet' in console:
+                    term_serv = console.split()[1]
+                    port = console.split()[2]
+                    if int(port) > 6000:
+                        port = int(port) - 6000
+                    if int(port) > 3000:
+                        port = int(port) - 3000
+                    elif int(port) > 2000:
+                        port = int(port) - 2000
+                    if 'con_credentials' in dev.connections:
+                        username = dev.connections.con_credentials.terminal_server_username
+                        password = dev.connections.con_credentials.terminal_server_password
+                        enable_password = dev.connections.con_credentials.terminal_server_enable_password
+                        uu.clear_line(term_serv, port, username, password, enable_password)
+                    else:
+                        uu.clear_line(term_serv, port)
+                else:
+                    logger.error("Dev: {} Unable to clear console: {}".
+                        format(dev.name, console))
+            else:
+                logger.error("Dev: {} Unable to clear console: {}".
+                    format(dev.name, console))
+
+def wait_for_reload_to_complete(timeout):
+    timePassed=0
+    while timePassed < timeout:
+        time.sleep(10)
+        timePassed += 10
+        Logger.info("Device reload is in progress, waiting for device to be ready to connect.")
+    Logger.info("Device reload wait completed, connecting to device now.")
+    return True
+
 #=========================Class/Functions===============
 #Multithread run
 class MultiUserThreadWithReturn(Thread):
@@ -257,7 +356,8 @@ class StackWiseVirtual(object):
                 else:
                     self.disconnect_from_stackpair(stackpair)
                 if not self.testbed.devices[stackpair["switch1"]].connected:
-                    dev_detail = self.testbed.devices[stackpair["switch1"]].connect()
+                    dev_detail = uni_connect(self.testbed.devices[stackpair["switch1"]])
+                    #.connect()
                 output = self.testbed.devices[stackpair["switch1"]].execute("show stackwise-virtual neighbors")
                 output1 = self.testbed.devices[stackpair["switch1"]].execute("show stackwise-virtual")
                 stackstatus = re.findall('Stackwise Virtual : Enabled',output1)
@@ -268,7 +368,8 @@ class StackWiseVirtual(object):
                         stackpair["status"] = True
                         self.testbed.devices[stackpair["switch1"]].disconnect()
                         self.testbed.devices[stackpair["switch2"]].disconnect()
-                        stackpair['stackwiseVirtualDev'].connect()
+                        uni_connect(stackpair['stackwiseVirtualDev'])
+                        #.connect()
                         return True
                     else:
                         Logger.info("The Switch does not have in Stackwise Virtual link. Treat it as 2 single nodes")
@@ -281,7 +382,8 @@ class StackWiseVirtual(object):
             except:
                 try:
                     Logger.error(traceback.format_exc())
-                    stackpair['stackwiseVirtualDev'].connect()
+                    uni_connect(stackpair['stackwiseVirtualDev'])
+                    #.connect()
                     stackpair["status"] = True
                     return True
                 except:
@@ -291,9 +393,11 @@ class StackWiseVirtual(object):
         else:
             try:
                 if not self.testbed.devices[stackpair["switch1"]].connected:
-                    dev_detail = self.testbed.devices[stackpair["switch1"]].connect()
+                    dev_detail = uni_connect(self.testbed.devices[stackpair["switch1"]])
+                    #.connect()
                 if not self.testbed.devices[stackpair["switch2"]].connected:
-                    dev_detail = self.testbed.devices[stackpair["switch2"]].connect()
+                    dev_detail = uni_connect(self.testbed.devices[stackpair["switch2"]])
+                    #.connect()
             except:
                 Logger.error("Could not connect to the device")
                 Logger.error(traceback.format_exc())
@@ -346,7 +450,7 @@ class StackWiseVirtual(object):
             else:
                 reload_switch_asynchronously(self.testbed.devices[stackpair["switch1"]])
                 reload_switch_asynchronously(self.testbed.devices[stackpair["switch2"]])
-            time.sleep(timeout)
+            wait_for_reload_to_complete(timeout)
         else:
             if stackpair['pairinfo']["platformType"] in SUPPORTED_PLATFORMS_LIST and stackpair["status"]:
                 stackpair['stackwiseVirtualDev'].execute("write memory")
@@ -668,7 +772,7 @@ class StackWiseVirtual(object):
             if re.findall("stackwise-virtual", output1):
                 Logger.info("Stackwise Virtual configs are present")
             else:
-                Logger.error("Stackwise Virtual configs are not present on the switch: {}".format(dev))
+                Logger.error("Stackwise Virtual configs are not present on the switch: {}".format(stackpair))
                 result=False
         else:
             switches=[stackpair["switch1"], stackpair["switch2"]]
