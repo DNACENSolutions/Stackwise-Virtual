@@ -116,3 +116,11 @@ Switch   Dad port       Status
 1  TenGigabitEthernet1/0/24   up     
 2  TenGigabitEthernet2/0/24   up 
 ```
+
+Steps to run job from docker image:
+1.  Go to the below link and download the docker image.
+      https://hub.docker.com/repository/docker/maranjega/docker_images
+2.  Find "Installing Docker Engine in CENTOS 7" from the below link for installing docker engine.
+      https://wiki.cisco.com/display/EDPEIXOT/Solutions+PyatsDocker+Build+procedure    
+3. Once installed the docker engine,run the below command from your linux machine.
+    " docker run --rm maranjega/docker_images:solution-eng-stackwise-jun15 pyats run job /pyats/sol_eng_stackwise_virtual/job/svl_update_job.py --testbed-file /pyats/sol_eng_stackwise_virtual/testbed/9500_sv_tb.yaml "
