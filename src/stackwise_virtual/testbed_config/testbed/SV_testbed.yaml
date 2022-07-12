@@ -1,0 +1,76 @@
+devices:
+  SWITCH-1:
+    alias: adsff
+    connections:
+      a:
+        arguments:
+          learn_hostname: true
+        ip: sdaffdsa
+        port: 2
+        protocol: telnet
+      defaults:
+        class: unicon.Unicon
+    custom:
+      switchnumber: '1'
+      switchpriority: '15'
+    os: iosxe
+    passwords: '%{testbed.passwords}'
+    tacacs: '%{testbed.tacacs}'
+    type: IOS-XE
+  SWITCH-2:
+    alias: asdfas
+    connections:
+      a:
+        arguments:
+          learn_hostname: true
+        ip: dsafdsa
+        port: telnet
+        protocol: telnet
+    custom:
+      switchnumber: '2'
+      switchpriority: '10'
+    os: iosxe
+    passwords: '%{testbed.passwords}'
+    tacacs: '%{testbed.tacacs}'
+    type: IOS-XE
+testbed:
+  custom:
+    switchstackinggroups:
+    - domainNumber: 3
+      numberofswitches: 2
+      platformType: '9600'
+      switchs:
+      - SWITCH-1
+      - SWITCH-2
+  name: STACKWISE-VIRTUAL
+  passwords:
+    enable: sdaf
+    line: sdaf
+    tacacs: fsdaf
+  tacacs:
+    login_prompt: 'Username:'
+    password_prompt: 'Password:'
+    username: fsfdsaf
+topology:
+  SWITCH-1:
+    interfaces:
+      TwentyFiveGigE1/1/0/25:
+        link: STACKWISEVIRTUAL-LINK-1
+        type: ethernet
+      TwentyFiveGigE1/1/0/31:
+        link: STACKWISEVIRTUAL-LINK-2
+        type: ethernet
+      TwentyFiveGigE1/1/0/48:
+        link: DAD-LINK-1
+        type: ethernet
+  SWITCH-2:
+    interfaces:
+      TwentyFiveGigE2/1/0/25:
+        link: STACKWISEVIRTUAL-LINK-1
+        type: ethernet
+      TwentyFiveGigE2/1/0/31:
+        link: STACKWISEVIRTUAL-LINK-2
+        type: ethernet
+      TwentyFiveGigE2/1/0/48:
+        link: DAD-LINK-1
+        type: ethernet

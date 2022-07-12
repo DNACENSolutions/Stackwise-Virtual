@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block form_content %}
+    <div class="form-container-left">
+        <h3 class="form-title"> Credentials </h3>
+        <div class="form_group">
+            {{form.username}}
+            <label for="username" class="form_input_label"> Username </label>
+        </div>
+        <div class="form_group">
+            {{form.password}}
+            <label for="password" class="form_input_label"> Password </label>
+        </div>
+        <div class="form_group">
+            {{form.enablepassword}}
+            <label for="enablepassword" class="form_input_label"> Enable Password </label>
+        </div>
+        <input type="checkbox" id="enable2password" name="checkbox" value="enable2password">
+        <label for="enable2password">Use separate credentials</label>
+        <h3 class="form-title"> Switch 1</h3>
+            <div class="form_group">
+                {{form.hostname1}}
+                <label for="hostname1" class="form_input_label"> Hostname </label>
+            </div>
+            <div class="form_group">
+                {{form.number1}}
+                <label for="number1" class="form_choice_label"> Switch Number </label>
+            </div>
+            <div class="form_group">
+                {{form.priority1}}
+                <label for="priority1" class="form_choice_label"> Switch Priority </label>
+            </div>
+            <div class="form_group">
+                {{form.ipaddress1}}
+                <label for="ipaddress1" class="form_input_label"> IP Address </label>
+            </div>
+            <div class="form_group">
+                {{form.port1}}
+                <label for="port1" class="form_input_label"> Port Number </label>
+            </div>
+            <div class="form_group">
+                {{form.protocol1}}
+                <label for="protocol1" class="form_choice_label"> Protocol </label>
+            </div>
+        <!-- <button class="form_button" style="margin-right: auto;">Back</button> -->
+    </div>
+    <div class="form-container-right">
+        <!-- <h3 class="form-title" style="color:#ffffff;">Credentials</h3>
+        <div class="form_group">
+            {{form.username.as_hidden}}
+            <label for="username" id="usernamelabel" class="form_input_label" hidden="hidden"> Username </label>
+        </div>
+        <div class="form_group">
+            {{form.password.as_hidden}}
+            <label for="password" id="passwordlabel" class="form_input_label" hidden="hidden"> Password </label>
+        </div>
+        <div class="form_group">
+            {{form.enablepassword.as_hidden}}
+            <label for="enablepassword" id="enablelabel" class="form_input_label" hidden="hidden"> Enable Password </label>
+        </div> -->
+        <h3 class="form-title" style="padding-top: 17.35rem;"> Switch 2</h3>
+            <div class="form_group">
+                {{form.hostname2}}
+                <label for="hostname2" class="form_input_label"> Hostname </label>
+            </div>
+            <div class="form_group">
+                {{form.number2}}
+                <label for="number2" class="form_choice_label"> Switch Number </label>
+            </div>
+            <div class="form_group">
+                {{form.priority2}}
+                <label for="priority2" class="form_choice_label"> Switch Priority </label>
+            </div>
+            <div class="form_group">
+                {{form.ipaddress2}}
+                <label for="ipaddress2" class="form_input_label"> IP Address </label>
+            </div>
+            <div class="form_group">
+                {{form.port2}}
+                <label for="port2" class="form_input_label"> Port Number </label>
+            </div>
+            <div class="form_group">
+                {{form.protocol2}}
+                <label for="protocol2" class="form_choice_label"> Protocol </label>
+            </div>
+        <!-- <button class="form_button" style="margin-left: auto;">Next</button> -->
+    </div>
+    <!-- LINKS -->
+    <div class="form-container-links">
+        <h3 class="form-title"> Links </h3>
+            <div id="formset-list">
+            {{formset1.formset_management}}
+            {% for form in formset1 %}
+                <div class="formset-cont"> {{form}} </div>
+            {% endfor %}
+            </div>
+        <!-- <div class="formset-line">
+            <div class="form_set" style="width:5rem;">
+                {{form.linktype}}
+                <label for="linktype" class="form_choice_label"> Link Type </label>
+            </div>            
+            <div class="form_set" style="width:15rem;">
+                {{form.interfacechoice}}
+                <label for="interfacechoice" class="form_choice_label"> Interface </label>
+            </div>
+            <div class="form_set" style="width:10rem;">
+                {{form.interface1}}
+                <label for="interface1" class="form_input_side_label"> 1/ </label>
+            </div>
+            <div class="form_set" style="width:10rem;">
+                {{form.interface2}}
+                <label for="interface2" class="form_input_side_label"> 2/ </label>
+            </div>
+        </div>        
+        
+            {% for form in formset2 %}
+            <div class="formset-line">
+                <div class="form_set" style="width:5rem;">
+                    {{form.linktype}}
+                    <label for="linktype" class="form_choice_label" hidden="hidden"> Link Type </label>
+                </div>            
+                <div class="form_set" style="width:15rem;">
+                    {{form.interfacechoice}}
+                    <label for="interfacechoice" class="form_choice_label" hidden="hidden"> Interface </label>
+                </div>
+                <div class="form_set" style="width:10rem;">
+                    {{form.interface1}}
+                    <label for="interface1" class="form_input_side_label" hidden="hidden"> 1/ </label>
+                </div>
+                <div class="form_set" style="width:10rem;">
+                    {{form.interface2}}
+                    <label for="interface2" class="form_input_side_label" hidden="hidden"> 2/ </label>
+                </div>  
+            </div>    
+            {% endfor %}
+                {% for form in formset3.as_hidden %}
+                <div class="formset-line">
+                    <div class="form_set" style="width:5rem;">
+                        {{form.linktype}}
+                        <label for="linktype" class="form_choice_label" hidden="hidden"> Link Type </label>
+                    </div>            
+                    <div class="form_set" style="width:15rem;">
+                        {{form.interfacechoice}}
+                        <label for="interfacechoice" class="form_choice_label" hidden="hidden"> Interface </label>
+                    </div>
+                    <div class="form_set" style="width:10rem;">
+                        {{form.interface1}}
+                        <label for="interface1" class="form_input_side_label" hidden="hidden"> 1/ </label>
+                    </div>
+                    <div class="form_set" style="width:10rem;">
+                        {{form.interface2}}
+                        <label for="interface2" class="form_input_side_label" hidden="hidden"> 2/ </label>
+                    </div>
+                </div>        
+                {% endfor %} -->
+                <div id="empty-form" class="'"> {{formset1.empty_form}} </div>
+                <button type="button" id="btn">add link</button>
+                <input type="submit" value="save" style="margin-left:40rem;">
+            </div>
+            {% endblock %}
+        {% block scripts %}
+        <script>
+            const btn = document.getElementById('btn')
+            btn.addEventListener('click', unhide_form)
+            function unhide_form(event) {
+                const copytarget = document.getElementById('formset-list')
+                const emptyformel = document.getElementById('empty-form').cloneNode(true)
+                emptyformel.setAttribute('class', 'formset-cont')
+                copytarget.append(emptyformel)
+            }
+        </script>
+        <script>
+            const check = document.querySelector("input[name=checkbox]")
+            check.addEventListener('change', unhide_second_cred)
+            function unhide_second_cred(event) {
+                if (this.checked) {
+                    console.log("checked")
+                    const username = document.getElementById('usernamelabel')
+                    const password = document.getElementById('passwordlabel')
+                    const enablepassword = document.getElementById('enablelabel')
+
+                    username.style.visibility = 'visible'
+                    password.style.visibility = 'visible'
+                    enablepassword.style.visibility = 'visible'
+                }
+            }
+        </script>
+        {% endblock %}
+        

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block form_content %}
+    <div class="form-container-left" style="padding-top: 7rem;">
+        <div class="form_group">
+            {{form.username}}
+            <label for="username" class="form_input_label"> Username </label>
+        </div>
+        <div class="form_group">
+            {{form.password}}
+            <label for="password" class="form_input_label"> Password </label>
+        </div>
+        <div class="form_group">
+            {{form.enablepassword}}
+            <label for="enablepassword" class="form_input_label"> Enable Password </label>
+        </div>
+    </div>
+    <div class="form-container-right" style="padding-top: 7rem;">
+        <div class="form_group">
+            {{form.username}}
+            <label for="username" class="form_input_label"> Username </label>
+        </div>
+        <div class="form_group">
+            {{form.password}}
+            <label for="password" class="form_input_label"> Password </label>
+        </div>
+        <div class="form_group">
+            {{form.enablepassword}}
+            <label for="enablepassword" class="form_input_label"> Enable Password </label>
+        </div>
+        <button class="form_button" style="margin-left:auto; margin-top:6rem;">Next</button>
+    </div>
+    {% endblock %}

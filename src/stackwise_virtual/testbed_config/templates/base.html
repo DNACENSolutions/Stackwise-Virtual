@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="{% static 'testbed_config/css/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="header-slots">
+            <div id="logo" >
+                <svg xmlns="http://www.w3.org/2000/svg" width="100" height="55" viewBox="0 -13 108 57" preserveAspectRatio="xMaxYMax" role="img">
+                <defs>
+                    <path d="M0 22.769a2.348 2.348 0 0 0 3.935 1.545c.434-.403.7-.955.744-1.545v-5.2a2.34 2.34 0 0 0-4.679 0v5.2" id="bar_short" class="bar"></path>
+                    <path d="M12.95 22.769a2.349 2.349 0 0 0 2.34 2.171 2.346 2.346 0 0 0 2.339-2.171V11.112a2.341 2.341 0 0 0-4.679 0V22.77" id="bar_tall" class="bar"></path><path d="M25.832 27.464a2.345 2.345 0 0 0 4.678 0V2.249a2.342 2.342 0 0 0-4.678 0v25.215" id="bar_grande" class="bar"></path>
+                </defs>
+                <g fill="#00a0d1" fill-rule="evenodd">
+                    <use href="#bar_short" x="0"></use>
+                    <use href="#bar_tall" x="0"></use>
+                    <use href="#bar_grande" x="0"></use>
+                    <use href="#bar_tall" x="25.875"></use>
+                    <use href="#bar_short" x="51.75"></use>
+                    <use href="#bar_tall" x="51.75"></use>
+                    <use href="#bar_grande" x="51.75"></use>
+                    <use href="#bar_tall" x="77.625"></use>
+                    <use href="#bar_short" x="103.375"></use>
+                </g>
+                </svg>
+            </div>
+            <div class="header-branding">
+                <div id="brand" style="font-size: 1.4rem; font-weight: 700;">Cisco</div>
+                <div id="product" style="font-size:1.4rem; font-weight:300; margin-left: 1rem;">StackWise Virtual Utility</div>
+            </div>
+        </div>
+    </header>
+    <div class="form-container-label">Configure Your Testbed</div>
+    <form class="form-container" method="POST">
+        {% csrf_token %}
+        {% block form_content %} {% endblock %}
+    </form>
+    {% block scripts %} {% endblock %}
+</body>
