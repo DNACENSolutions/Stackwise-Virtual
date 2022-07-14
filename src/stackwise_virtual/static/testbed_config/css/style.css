@@ -1,0 +1,280 @@
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSans-Thin.37779ae63dfa39c161fcfeedb8ea522d.woff2");
+  font-style: normal;
+  font-weight: 100;
+}
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSans-ExtraLight.ba2d1bfad3a555f583f8c6db0607db4c.woff2");
+  font-style: normal;
+  font-weight: 200;
+}
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSansLight.06e20139f6b3921021d560b5bd4222ea.woff2");
+  font-style: normal;
+  font-weight: 300;
+}
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSans.7ac8ac97549fefe989dc446f8b9ae79d.woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSans-Bold.73b6a923295858e41e8636d5075bf95f.woff2");
+  font-style: normal;
+  font-weight: 700;
+}
+body {
+  font-family: "CiscoSans";
+}
+
+header {
+  background: #ffffff;
+  height: 4rem;
+  padding: 0 1rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  grid-template-areas: "logo branding product blank blank";
+}
+
+.header-slots {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.header-branding {
+  display: flex;
+  color: #00a0d1;
+  padding-left: 1.5rem;
+}
+
+.form-container {
+  background: #ffffff;
+  min-height: 32rem;
+  width: 50rem;
+  border-radius: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 0.1fr;
+  border: 1px solid #545454;
+  margin: auto;
+  margin-top: 2.5rem;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.form-container-label {
+  background: #ffffff;
+  color: #545454;
+  font-weight: 200;
+  font-size: 1.75rem;
+  position: absolute;
+  left: 16.5rem;
+  top: 5.65rem;
+  border: solid #ffffff;
+  border-width: 3px 10px;
+}
+
+.form-container-left {
+  grid-area: 1/1/1/1;
+  background-color: #ffffff;
+}
+
+.form-container-right {
+  grid-area: 1/2/1/2;
+  background-color: #ffffff;
+}
+
+.form-container-links {
+  padding-top: 3rem;
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 2;
+  background-color: #ffffff;
+}
+
+.formset-line {
+  position: relative;
+  height: 4rem;
+}
+
+.form-title {
+  font-family: "CiscoSans";
+  font-weight: 200;
+  font-size: 1.2rem;
+  color: #00a0d1;
+}
+
+.formset-cont {
+  position: relative;
+  height: 4rem;
+  display: inline-block;
+}
+
+.form {
+  position: relative;
+  width: 100%;
+}
+.form_group {
+  position: relative;
+  height: 4rem;
+}
+.form_set {
+  position: relative;
+  height: 4rem;
+  display: inline-block;
+}
+.form_input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1rem;
+  width: 50%;
+  border: 1px solid #545454;
+  border-radius: 0.2rem;
+  font-family: "CiscoSans";
+  font-size: 1rem;
+  color: #545454;
+  outline: none;
+  padding: 0.5rem;
+  background: none;
+}
+.form_input:hover {
+  border-color: #00a0d1;
+}
+.form_input:focus {
+  border-color: #007aa3;
+  border-width: 2px;
+}
+.form_input_label {
+  position: absolute;
+  left: 0.58rem;
+  top: 0.48rem;
+  background-color: #ffffff;
+  color: #545454;
+  border: solid #ffffff;
+  border-width: 0px 3px;
+  cursor: text;
+  transition: top 200ms ease-in, left 200ms ease-in, font-size 200ms ease-in, font-weight 200ms ease-in;
+}
+.form_input_side_label {
+  position: absolute;
+  left: -1.4rem;
+  top: 0.48rem;
+  background-color: #ffffff;
+  color: #545454;
+  border: solid #ffffff;
+  border-width: 0px 3px;
+  cursor: text;
+}
+.form_choice {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2rem;
+  width: 50%;
+  border: 1px solid #545454;
+  border-radius: 0.2rem;
+  font-family: "CiscoSans";
+  font-size: 1rem;
+  color: #545454;
+  outline: none;
+  padding: 0.5rem 0.5rem 0.2rem;
+  background: none;
+}
+.form_choice:hover {
+  border-color: #00a0d1;
+}
+.form_choice:focus {
+  border-color: #007aa3;
+  border-width: 2px;
+}
+.form_choice_label {
+  position: absolute;
+  font-weight: 200;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+  background-color: #ffffff;
+  color: #545454;
+  border: solid #ffffff;
+  border-width: 0px 3px;
+  cursor: text;
+}
+.form_button {
+  display: block;
+  padding: 0.75rem 2rem;
+  background-color: #00a0d1;
+  font-family: "CiscoSans";
+  font-size: 1rem;
+  color: #ffffff;
+  font-weight: 400;
+  border-radius: 0.5rem;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 200ms ease-in;
+}
+.form_button:hover {
+  background-color: #007aa3;
+}
+
+.form_input:not(:-moz-placeholder-shown).form_input:not(:focus) ~ .form_input_label {
+  color: #007aa3;
+  font-weight: 200;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form_input:not(:-ms-input-placeholder).form_input:not(:focus) ~ .form_input_label {
+  color: #007aa3;
+  font-weight: 200;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form_input:focus ~ .form_input_label,
+.form_input:not(:placeholder-shown).form_input:not(:focus) ~ .form_input_label {
+  color: #007aa3;
+  font-weight: 200;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form_input:not(:-moz-placeholder-shown).form_input:not(:focus) ~ .form_input_label {
+  color: #545454;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form_input:not(:-ms-input-placeholder).form_input:not(:focus) ~ .form_input_label {
+  color: #545454;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form_input:not(:placeholder-shown).form_input:not(:focus) ~ .form_input_label {
+  color: #545454;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form_choice:hover ~ .form_choice_label {
+  color: #00a0d1;
+}
+
+.form_choice:focus ~ .form_choice_label {
+  color: #007aa3;
+}/*# sourceMappingURL=style.css.map */
