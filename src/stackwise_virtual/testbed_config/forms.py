@@ -14,6 +14,10 @@ class ConfigForm(forms.Form):
     password = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form_input', 'id': 'password', 'autocomplete': 'off'}))
     enablepassword = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form_input', 'id': 'enablepassword', 'autocomplete': 'off'}))
 
+    username2 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form_input', 'id': 'username2', 'autocomplete': 'off',}))
+    password2 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form_input', 'id': 'password2', 'autocomplete': 'off'}))
+    enablepassword2 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form_input', 'id': 'enablepassword2', 'autocomplete': 'off'}))
+
     # separate switch forms
     hostname1 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form_input', 'id': 'hostname1', 'autocomplete': 'off'}))
     number1 = forms.ChoiceField(choices=num_choices, initial=1, widget=forms.Select(attrs={'placeholder': ' ','class': 'form_choice', 'id': 'number1'}))
@@ -41,9 +45,9 @@ class LinksConfigForm(forms.Form):
         ('TenGigE', 'TenGigE'),
         ('HundredGigE', 'HundredGigE')
     ]
-    linktype = forms.ChoiceField(label=" ", choices=linktype_choices, widget=forms.Select(attrs={'placeholder': ' ', 'id': 'linktype', 'style': 'width:5rem;'}))
-    interfacechoice = forms.ChoiceField(label=" ", choices=interface_choices, widget=forms.Select(attrs={'placeholder': ' ', 'id': 'interfacechoice', 'style': 'width:10rem;'}))
-    interface1 = forms.CharField(label=" ", widget=forms.TextInput(attrs={'placeholder': ' ', 'id': 'interface1', 'autocomplete': 'off', 'style': 'width:5rem;'}))
-    interface2 = forms.CharField(label=" ", widget=forms.TextInput(attrs={'placeholder': ' ', 'id': 'interface2', 'autocomplete': 'off', 'style': 'width:5rem;'}))
+    linktype = forms.ChoiceField(choices=linktype_choices, widget=forms.Select(attrs={'placeholder': ' ', 'class': 'form_choice', 'id': 'linktype', 'style': 'width:5rem;'}))
+    interfacechoice = forms.ChoiceField(choices=interface_choices, widget=forms.Select(attrs={'placeholder': ' ', 'class': 'form_choice', 'id': 'interfacechoice', 'style': 'width:10rem;'}))
+    interface1 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form_input', 'id': 'interface1', 'autocomplete': 'off', 'style': 'width:5rem;'}))
+    interface2 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form_input', 'id': 'interface2', 'autocomplete': 'off', 'style': 'width:5rem;'}))
 
 
