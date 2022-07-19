@@ -13,7 +13,7 @@ from unicon.utils import Utils as unicon_utils
 SVLVERSION_9500="16.8.1"
 SVLVERSION_9400="16.9.1"
 SVLVERSION_9600="16.12.1"
-MAXRELOADTIMEOUT=600
+MAXRELOADTIMEOUT=300
 EXCEPTIONRELOADTIMEWAIT=120
 PLATFORMVERSIONREFERENCE=[
     {   "platform": ["C9500-40X","C5900-16X","C5900-12Q","C9500-24Q"],
@@ -69,6 +69,8 @@ def uni_connect(dev, retry=2, wait_sec=1, config_timeout=120):
 
     for run in range(retry): 
         try:
+            print(dev.connections.a.protocol)
+            print(dev.connections.a.ip)
             dev.connect(prompt_recovery=True)
             dev.configure.timeout = config_timeout
             result = True
@@ -76,19 +78,20 @@ def uni_connect(dev, retry=2, wait_sec=1, config_timeout=120):
         except ConnectionError as e:
             logger.warning("Failed login through primary , trying clearing console and retry")
             try:
-                uni_clear_console(dev)
+                if dev.connections.a.protocol=="telnet":
+                    uni_clear_console(dev)
                 dev.disconnect()
                 time.sleep(wait_sec)
             except:
                 logger.error(traceback.format_exc())
                 logger.info("clearing line for try:{}/{}".format(run+1, retry))
-                uni_clear_console(dev)
+                if dev.connections.default.protocol=="telnet":
+                    uni_clear_console(dev)
                 dev.disconnect()
                 time.sleep(wait_sec)
         if result:
             break
     return result
-
 def uni_clear_console(dev):
     '''
         Function: uni_clear_console
