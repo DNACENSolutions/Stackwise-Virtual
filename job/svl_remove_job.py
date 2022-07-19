@@ -3,7 +3,7 @@ svl_remove_job.py
 
 This job is to launch the script: scripts/stackwise_virtual.py.
 
-This should be run in your python environment with pyats installed. 
+This should be run in your python environment with pyats installed.
 
 Run this job from parent directory:
     pyats run job job/svl_remove_job.py --testbed ./testbed/9500_sv_tb.yaml
@@ -36,19 +36,17 @@ def main(runtime):
         return False
     job_list=[]
     script_name = os.path.join(SCRIPT_PATH,'scripts/remove_stackwise_virtual.py')
-    for svlPair in runtime.testbed.custom['switchstackinggroups']:
-        print(svlPair)
+    for svl_pair in runtime.testbed.custom['switchstackinggroups']:
+        print(svl_pair)
         task1 = Task(testscript = script_name,
                         runtime=runtime,
-                        svlPair=svlPair,
-                        taskid = 'SVLTask-{}-{}:{}'.format(script_name.split('/')[-1],svlPair["platformType"],svlPair["switchs"]))
+                        svl_pair=svl_pair,
+                        taskid = f"SVLTask-{script_name.split('/')[-1]}-{svl_pair['platformType']}:{svl_pair['switchs']}")
         job_list.append(task1)
         # start the task
         task1.start()
         time.sleep(1)
-
     # wait for a max runtime of 60*5 seconds = 5 minutes
     for task1 in job_list:
         result = task1.wait(MAX_TASK_WAIT_TIME)
         print(result)
-

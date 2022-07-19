@@ -22,6 +22,7 @@ __contact__ = ['pawansi@cisco.com']
 __credits__ = ['list', 'of', 'credit']
 __version__ = 1.0
 
+import io
 import os
 import time
 from pyats.easypy import run
@@ -37,12 +38,12 @@ def main(runtime):
         return False
     job_list=[]
     script_name = os.path.join(SCRIPT_PATH,'scripts/stackwise_virtual.py')
-    for svlPair in runtime.testbed.custom['switchstackinggroups']:
-        print(svlPair)
+    for svl_pair in runtime.testbed.custom['switchstackinggroups']:
+        print(svl_pair)
         task1 = Task(testscript = script_name,
                         runtime=runtime,
-                        svlPair=svlPair,
-                        taskid = 'SVLTask-{}-{}:{}'.format(script_name.split('/')[-1],svlPair["platformType"],svlPair["switchs"]))
+                        svl_pair=svl_pair,
+                        taskid = f"SVLTask-{script_name.split('/')[-1]}-{svl_pair['platformType']}:{svl_pair['switchs']}")
         job_list.append(task1)
         # start the task
         task1.start()
@@ -52,4 +53,3 @@ def main(runtime):
     for task1 in job_list:
         result = task1.wait(MAX_TASK_WAIT_TIME)
         print(result)
-
