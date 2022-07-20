@@ -13,7 +13,7 @@ from unicon.utils import Utils as unicon_utils
 SVLVERSION_9500="16.8.1"
 SVLVERSION_9400="16.9.1"
 SVLVERSION_9600="16.12.1"
-MAXRELOADTIMEOUT=600
+MAXRELOADTIMEOUT=300
 EXCEPTIONRELOADTIMEWAIT=120
 PLATFORMVERSIONREFERENCE=[
     {   "platform": ["C9500-40X","C5900-16X","C5900-12Q","C9500-24Q"],
@@ -69,6 +69,8 @@ def uni_connect(dev, retry=2, wait_sec=1, config_timeout=120):
 
     for run in range(retry): 
         try:
+            print(dev.connections.a.protocol)
+            print(dev.connections.a.ip)
             dev.connect(prompt_recovery=True)
             dev.configure.timeout = config_timeout
             result = True
@@ -76,19 +78,20 @@ def uni_connect(dev, retry=2, wait_sec=1, config_timeout=120):
         except ConnectionError as e:
             logger.warning("Failed login through primary , trying clearing console and retry")
             try:
-                uni_clear_console(dev)
+                if dev.connections.a.protocol=="telnet":
+                    uni_clear_console(dev)
                 dev.disconnect()
                 time.sleep(wait_sec)
             except:
                 logger.error(traceback.format_exc())
                 logger.info("clearing line for try:{}/{}".format(run+1, retry))
-                uni_clear_console(dev)
+                if dev.connections.default.protocol=="telnet":
+                    uni_clear_console(dev)
                 dev.disconnect()
                 time.sleep(wait_sec)
         if result:
             break
     return result
-
 def uni_clear_console(dev):
     '''
         Function: uni_clear_console
@@ -197,25 +200,35 @@ class StackWiseVirtual(object):
                     dev_stack["switch{}".format(count)] = switch
                     count=count+1
                     dev_stack['pairinfo'] = pair
-                dev_stack['stackwiseVirtualDev'] =  Device(name=self.testbed.devices[dev_stack["switch1"]].name+"svl",
-                            type=self.testbed.devices[dev_stack["switch1"]].type,
-                            os=self.testbed.devices[dev_stack["switch1"]].os,
-                            testbed=self.testbed.devices[dev_stack["switch1"]].testbed,
-                            passwords=self.testbed.devices[dev_stack["switch1"]].passwords,
-                            credentials=self.testbed.devices[dev_stack["switch1"]].credentials,
-                            tacacs=self.testbed.devices[dev_stack["switch1"]].tacacs,
-                            custom=self.testbed.devices[dev_stack["switch1"]].custom,
-                            connections=self.testbed.devices[dev_stack["switch1"]].connections)
-                for key in list(self.testbed.devices[dev_stack["switch2"]].connections.keys()):
+                if self.testbed.devices[dev_stack["switch1"]].custom.switchnumber == 1:
+                    switch1 = "switch1"
+                    switch2 = "switch2"
+                else:
+                    switch1 = "switch2"
+                    switch2 = "switch1"
+                dev_stack['stackwiseVirtualDev'] =  Device(name=self.testbed.devices[dev_stack[switch1]].name+"svl",
+                            type=self.testbed.devices[dev_stack[switch1]].type,
+                            os=self.testbed.devices[dev_stack[switch1]].os,
+                            testbed=self.testbed.devices[dev_stack[switch1]].testbed,
+                            passwords=self.testbed.devices[dev_stack[switch1]].passwords,
+                            credentials=self.testbed.devices[dev_stack[switch1]].credentials,
+                            tacacs=self.testbed.devices[dev_stack[switch1]].tacacs,
+                            custom=self.testbed.devices[dev_stack[switch1]].custom,
+                            connections=self.testbed.devices[dev_stack[switch1]].connections)
+                for key in list(self.testbed.devices[dev_stack[switch2]].connections.keys()):
                     if key in SKIPCONLIST:
                         continue
                     else:
                         for k in CONNECTIONKEYS:
-                            if k in list(self.testbed.devices[dev_stack["switch1"]].connections.keys()):
+                            if k in list(self.testbed.devices[dev_stack[switch1]].connections.keys()):
                                 continue
                             else:
-                                dev_stack['stackwiseVirtualDev'].connections[k] = self.testbed.devices[dev_stack["switch2"]].connections[key]
-                                break
+                                print(self.testbed.devices[dev_stack[switch2]].connections[key])
+                                if self.testbed.devices[dev_stack[switch2]].connections[key]["protocol"] == "ssh":
+                                    continue
+                                else:
+                                    self.testbed.devices[dev_stack[switch1]].connections[key] = self.testbed.devices[dev_stack[switch2]].connections[key]
+                                    break
 
                 Logger.info(dev_stack['stackwiseVirtualDev'].connections)
                 dev_stack["status"] = False
@@ -233,25 +246,35 @@ class StackWiseVirtual(object):
                         dev_stack["switch{}".format(count)] = switch
                         count=count+1
                         dev_stack['pairinfo'] = pair
+                    if self.testbed.devices[dev_stack["switch1"]].custom.switchnumber == 1:
+                        switch1 = "switch1"
+                        switch2 = "switch2"
+                    else:
+                        switch1 = "switch2"
+                        switch2 = "switch1"
                     dev_stack['stackwiseVirtualDev'] =  Device(name=self.testbed.devices[dev_stack["switch1"]].name+"svl",
-                                type=self.testbed.devices[dev_stack["switch1"]].type,
-                                os=self.testbed.devices[dev_stack["switch1"]].os,
-                                testbed=self.testbed.devices[dev_stack["switch1"]].testbed,
-                                passwords=self.testbed.devices[dev_stack["switch1"]].passwords,
-                                credentials=self.testbed.devices[dev_stack["switch1"]].credentials,
-                                tacacs=self.testbed.devices[dev_stack["switch1"]].tacacs,
-                                custom=self.testbed.devices[dev_stack["switch1"]].custom,
-                                connections=self.testbed.devices[dev_stack["switch1"]].connections)
-                    for key in list(self.testbed.devices[dev_stack["switch2"]].connections.keys()):
+                                type=self.testbed.devices[dev_stack[switch1]].type,
+                                os=self.testbed.devices[dev_stack[switch1]].os,
+                                testbed=self.testbed.devices[dev_stack[switch1]].testbed,
+                                passwords=self.testbed.devices[dev_stack[switch1]].passwords,
+                                credentials=self.testbed.devices[dev_stack[switch1]].credentials,
+                                tacacs=self.testbed.devices[dev_stack[switch1]].tacacs,
+                                custom=self.testbed.devices[dev_stack[switch1]].custom,
+                                connections=self.testbed.devices[dev_stack[switch1]].connections)
+                    for key in list(self.testbed.devices[dev_stack[switch2]].connections.keys()):
                         if key in SKIPCONLIST:
                             continue
                         else:
                             for k in CONNECTIONKEYS:
-                                if k in list(self.testbed.devices[dev_stack["switch1"]].connections.keys()):
+                                if k in list(self.testbed.devices[dev_stack[switch1]].connections.keys()):
                                     continue
                                 else:
-                                    dev_stack['stackwiseVirtualDev'].connections[k] = self.testbed.devices[dev_stack["switch2"]].connections[key]
-                                    break
+                                    print(self.testbed.devices[dev_stack[switch2]].connections[key])
+                                    if self.testbed.devices[dev_stack[switch2]].connections[key]["protocol"] == "ssh":
+                                        continue
+                                    else:
+                                        dev_stack['stackwiseVirtualDev'].connections[k] = self.testbed.devices[dev_stack[switch2]].connections[key]
+                                        break
 
                     Logger.info(dev_stack['stackwiseVirtualDev'].connections)
                     dev_stack["status"] = False
@@ -496,34 +519,44 @@ class StackWiseVirtual(object):
         if not self.connect_to_stackpair(stackpair):
             Logger.error("Could not connect to devices, Can not proceed.")
             return False
-        #On Switch1
         if stackpair['pairinfo']["platformType"] in [9500, "9500"]: 
+             #On Switch1
             self.testbed.devices[stackpair["switch1"]].execute("switch 1 renumber  {}".format(
-                self.testbed.devices[stackpair["switch1"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
-            self.testbed.devices[stackpair["switch1"]].execute("switch 2 renumber  {}".format(
                 self.testbed.devices[stackpair["switch1"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
             self.testbed.devices[stackpair["switch1"]].execute("switch {} priority {}".format(
                     self.testbed.devices[stackpair["switch1"]].custom["switchnumber"],
                     self.testbed.devices[stackpair["switch1"]].custom["switchpriority"]),reply=DIALOG_CONFIRM)
             #On Switch2
-            self.testbed.devices[stackpair["switch2"]].execute("switch 1 renumber  {}".format(
-                self.testbed.devices[stackpair["switch2"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
             self.testbed.devices[stackpair["switch2"]].execute("switch 2 renumber  {}".format(
                 self.testbed.devices[stackpair["switch2"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
             self.testbed.devices[stackpair["switch2"]].execute("switch {} priority {}".format(
                     self.testbed.devices[stackpair["switch2"]].custom["switchnumber"],
                     self.testbed.devices[stackpair["switch2"]].custom["switchpriority"]),reply=DIALOG_CONFIRM)
-
-        elif stackpair['pairinfo']["platformType"] in [9400, 9600, "9400", "9600"]: 
-            self.testbed.devices[stackpair["switch1"]].execute("switch renumber  {}".format(
-                self.testbed.devices[stackpair["switch1"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
-            self.testbed.devices[stackpair["switch1"]].execute("switch priority {}".format(
-                self.testbed.devices[stackpair["switch1"]].custom["switchpriority"]),reply=DIALOG_CONFIRM)
-            #On Switch2
-            self.testbed.devices[stackpair["switch2"]].execute("switch renumber {}".format(
-                self.testbed.devices[stackpair["switch2"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
-            self.testbed.devices[stackpair["switch2"]].execute("switch priority {}".format(
-                self.testbed.devices[stackpair["switch2"]].custom["switchpriority"]),reply=DIALOG_CONFIRM)
+        elif stackpair['pairinfo']["platformType"] in [9400, 9600, "9400", "9600"]:
+            try: 
+                self.testbed.devices[stackpair["switch1"]].execute("switch renumber  {}".format(
+                    self.testbed.devices[stackpair["switch1"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
+                self.testbed.devices[stackpair["switch1"]].execute("switch priority {}".format(
+                    self.testbed.devices[stackpair["switch1"]].custom["switchpriority"]),reply=DIALOG_CONFIRM)
+            except:
+                 #On Switch1
+                self.testbed.devices[stackpair["switch1"]].execute("switch 1 renumber  {}".format(
+                    self.testbed.devices[stackpair["switch1"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
+                self.testbed.devices[stackpair["switch1"]].execute("switch {} priority {}".format(
+                        self.testbed.devices[stackpair["switch1"]].custom["switchnumber"],
+                        self.testbed.devices[stackpair["switch1"]].custom["switchpriority"]),reply=DIALOG_CONFIRM)
+            try:
+                #On Switch2
+                self.testbed.devices[stackpair["switch2"]].execute("switch renumber {}".format(
+                    self.testbed.devices[stackpair["switch2"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
+                self.testbed.devices[stackpair["switch2"]].execute("switch priority {}".format(
+                    self.testbed.devices[stackpair["switch2"]].custom["switchpriority"]),reply=DIALOG_CONFIRM)
+            except:
+                self.testbed.devices[stackpair["switch2"]].execute("switch 2 renumber  {}".format(
+                    self.testbed.devices[stackpair["switch2"]].custom["switchnumber"]),reply=DIALOG_CONFIRM)
+                self.testbed.devices[stackpair["switch2"]].execute("switch {} priority {}".format(
+                        self.testbed.devices[stackpair["switch2"]].custom["switchnumber"],
+                        self.testbed.devices[stackpair["switch2"]].custom["switchpriority"]),reply=DIALOG_CONFIRM)
         else:
             Logger.error("Unsupported Platform Type provided in the yaml")
             return False
@@ -878,5 +911,3 @@ def reload_switch_asynchronously(oRtr):
         Logger.error(traceback.format_exc())
         Logger.error("Error in reloading the device asynchronously.")
         return False
-
-
