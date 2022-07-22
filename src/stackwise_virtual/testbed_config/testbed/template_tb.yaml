@@ -10,6 +10,7 @@ testbed:
         tacacs: Sample#1223
         enable: Cisco#123
         line: Cisco#123
+        
     #Details to form stackwise virtual Paris. leave it ok with default.
     #platformType should be 9500 for all 9500/9500H platform.
     #platformType should be 9600 for all 9600 based platform.
