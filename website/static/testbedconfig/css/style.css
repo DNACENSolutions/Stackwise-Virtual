@@ -1,0 +1,480 @@
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSans-Thin.37779ae63dfa39c161fcfeedb8ea522d.woff2");
+  font-style: normal;
+  font-weight: 100;
+}
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSans-ExtraLight.ba2d1bfad3a555f583f8c6db0607db4c.woff2");
+  font-style: normal;
+  font-weight: 200;
+}
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSansLight.06e20139f6b3921021d560b5bd4222ea.woff2");
+  font-style: normal;
+  font-weight: 300;
+}
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSans.7ac8ac97549fefe989dc446f8b9ae79d.woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "CiscoSans";
+  src: url("../font/CiscoSans-Bold.73b6a923295858e41e8636d5075bf95f.woff2");
+  font-style: normal;
+  font-weight: 700;
+}
+body {
+  font-family: "CiscoSans";
+  background-color: #ffffff;
+  height: 100vh;
+  margin: 0;
+}
+
+header {
+  background-color: #ffffff;
+  height: 4rem;
+  padding: 0 1rem;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  grid-template-areas: "logo brand product loadfile runtests";
+  font-size: 1.3rem;
+  color: #00a0d1;
+}
+header__slots {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.main-page {
+  background: #ffffff;
+  display: grid;
+  margin-top: 3%;
+  height: 83.8vh;
+  grid-template-columns: auto 50% auto;
+  grid-template-areas: "empty1 content empty2";
+}
+.main-page__card {
+  grid-area: content;
+  height: 95%;
+  background: #ffffff;
+  border: 2px solid #dedede;
+  box-sizing: border-box;
+}
+.main-page__card__title {
+  position: relative;
+  left: 10%;
+  bottom: 2.8%;
+  border: solid #ffffff;
+  border-width: 1px 10px;
+  background: #ffffff;
+  font-weight: 200;
+  font-size: 1.5rem;
+}
+.main-page__card__form {
+  display: none;
+  position: relative;
+  margin: 1.4rem;
+  margin-top: 0;
+  bottom: 5%;
+  height: 95%;
+  background: #ffffff;
+  grid-template-columns: 1fr 1fr;
+}
+.main-page__card__form__title {
+  font-size: 1.2rem;
+  font-weight: 200;
+  color: #00a0d1;
+  margin: auto;
+  margin-bottom: 2rem;
+}
+
+.main-page__card__form.active {
+  display: grid;
+}
+
+.form {
+  position: relative;
+  width: 100%;
+}
+.form__section-title {
+  font-size: 1rem;
+  font-weight: 200;
+  color: #00a0d1;
+  margin: 0rem 4rem;
+  margin-bottom: 1rem;
+}
+.form__section-title--hidden {
+  font-size: 1rem;
+  font-weight: 200;
+  color: #00a0d1;
+  margin: 0rem 4rem;
+  margin-bottom: 1rem;
+  visibility: hidden;
+}
+.form__group {
+  position: relative;
+  height: 4rem;
+}
+.form__input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0.8rem;
+  width: 50%;
+  border: 1px solid #dedede;
+  border-radius: 0.2rem;
+  font-family: "CiscoSans";
+  font-size: 1rem;
+  color: #545454;
+  outline: none;
+  padding: 0.5rem;
+  background: none;
+  margin: 0rem 3rem;
+}
+.form__input:hover {
+  border-color: #00a0d1;
+}
+.form__input:focus {
+  border-color: #007aa3;
+  border-width: 2px;
+}
+.form__input__label {
+  font-size: 0.85rem;
+  position: absolute;
+  left: 0.58rem;
+  top: 0.48rem;
+  background-color: #ffffff;
+  color: #878787;
+  border: solid #ffffff;
+  border-width: 0px 3px;
+  margin: 0rem 3rem;
+  cursor: text;
+  transition: top 200ms ease-in, left 200ms ease-in, font-size 200ms ease-in, font-weight 200ms ease-in;
+}
+.form__input__label--side {
+  position: absolute;
+  left: -1.4rem;
+  top: 0.48rem;
+  background-color: #ffffff;
+  color: #dedede;
+  border: solid #ffffff;
+  border-width: 0px 3px;
+}
+.form__checkbox {
+  background: none;
+}
+.form__checkbox__highlight {
+  height: 1.4rem;
+  width: 1.4rem;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1), background-color 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.form__choice {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1.8rem;
+  width: 50%;
+  border: 1px solid #dedede;
+  border-radius: 0.2rem;
+  font-family: "CiscoSans";
+  font-size: 1rem;
+  color: #545454;
+  outline: none;
+  padding: 0.4rem 0.2rem 0.1rem 0.2rem;
+  background: none;
+  margin: 0rem 3rem;
+}
+.form__choice:hover {
+  border-color: #00a0d1;
+}
+.form__choice:focus {
+  border-color: #007aa3;
+  border-width: 2px;
+}
+.form__choice__label {
+  font-size: 0.85rem;
+  position: absolute;
+  font-weight: 200;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+  background-color: #ffffff;
+  color: #878787;
+  border: solid #ffffff;
+  border-width: 0px 3px;
+  margin: 0rem 3rem;
+}
+
+.button {
+  background-color: #00a0d1;
+  font-weight: 300;
+  font-size: 0.9rem;
+  color: #ffffff;
+  height: 2rem;
+  width: 4.5rem;
+  padding: 0.5rem;
+  display: inline-block;
+  border-radius: 0.2rem;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.button:hover {
+  color: #007aa3;
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
+}
+
+.button--circular {
+  background-color: #00a0d1;
+  font-weight: 300;
+  font-size: 0.9rem;
+  color: #ffffff;
+  height: 1.2rem;
+  width: 1.2rem;
+  padding: 0rem;
+  border-radius: 50%;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.button--circular:hover {
+  color: #007aa3;
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
+}
+
+.formset-line {
+  background: #ffffff;
+  border-radius: 0.2rem;
+  padding: 0.5rem;
+}
+.formset-line:hover {
+  background: rgba(0, 160, 209, 0.05);
+}
+.formset-line__button {
+  margin: 0;
+  width: 2rem;
+  display: inline-block;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.no-display {
+  display: none;
+}
+
+#port1::-webkit-outer-spin-button,
+#port1::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#port2::-webkit-outer-spin-button,
+#port2::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.form__input:not(:-moz-placeholder-shown).form__input:not(:focus) ~ .form__input__label {
+  color: #007aa3;
+  font-weight: 200;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form__input:not(:-ms-input-placeholder).form__input:not(:focus) ~ .form__input__label {
+  color: #007aa3;
+  font-weight: 200;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form__input:focus ~ .form__input__label,
+.form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label {
+  color: #007aa3;
+  font-weight: 200;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form__input:not(:-moz-placeholder-shown).form__input:not(:focus) ~ .form__input__label {
+  color: #dedede;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form__input:not(:-ms-input-placeholder).form__input:not(:focus) ~ .form__input__label {
+  color: #dedede;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label {
+  color: #dedede;
+  top: -0.45rem;
+  font-size: 0.8rem;
+  left: 0.5rem;
+}
+
+.form__choice:hover ~ .form__choice__label {
+  color: #00a0d1;
+}
+
+.form__choice:focus ~ .form__choice__label {
+  color: #007aa3;
+}
+
+#cred2checkbox:hover ~ .form__checkbox__highlight {
+  color: rgba(0, 160, 209, 0.2117647059);
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.list-entry {
+  height: 3rem;
+  font-size: 1.2rem;
+  font-weight: 200;
+  background: #ffffff;
+  border-radius: 0.2rem;
+  padding: 0.5rem;
+  border-bottom: solid 1px #dedede;
+  text-align: left;
+  outline: none;
+  cursor: pointer;
+  color: #545454;
+  width: 100%;
+  border: none;
+}
+
+.active--2, .list-entry:hover {
+  background: rgba(0, 160, 209, 0.05);
+}
+
+.list-entry-content {
+  overflow: hidden;
+  background: #ffffff;
+  max-height: 0;
+  transition: max-height 0.2s ease-out;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 5rem;
+  background-color: #545454;
+  color: #ffffff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 0.2rem;
+  font-size: 0.8rem;
+  position: absolute;
+  top: 100%;
+  right: -75%;
+  z-index: 1;
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #545454 transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+@-webkit-keyframes fade_in {
+  from {
+    opacity: 0;
+    transform: translateX(50rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade_in {
+  from {
+    opacity: 0;
+    transform: translateX(50rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@-webkit-keyframes fade_out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50rem);
+  }
+}
+@keyframes fade_out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50rem);
+  }
+}
+@-webkit-keyframes fade_out_backwards {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(50rem);
+  }
+}
+@keyframes fade_out_backwards {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(50rem);
+  }
+}
+@-webkit-keyframes hide_scroll {
+  from, to {
+    overflow: hidden;
+  }
+}
+@keyframes hide_scroll {
+  from, to {
+    overflow: hidden;
+  }
+}/*# sourceMappingURL=style.css.map */

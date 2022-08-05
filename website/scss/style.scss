@@ -1,0 +1,449 @@
+@font-face {
+    font-family: "CiscoSans";
+    src: url("../font/CiscoSans-Thin.37779ae63dfa39c161fcfeedb8ea522d.woff2");
+    font-style: normal;
+    font-weight: 100;
+}
+@font-face {
+    font-family: "CiscoSans";
+    src: url("../font/CiscoSans-ExtraLight.ba2d1bfad3a555f583f8c6db0607db4c.woff2");
+    font-style: normal;
+    font-weight: 200;
+}
+@font-face {
+    font-family: "CiscoSans";
+    src: url("../font/CiscoSansLight.06e20139f6b3921021d560b5bd4222ea.woff2");
+    font-style: normal;
+    font-weight: 300;
+}
+@font-face {
+    font-family: "CiscoSans";
+    src: url("../font/CiscoSans.7ac8ac97549fefe989dc446f8b9ae79d.woff2");
+    font-style: normal;
+    font-weight: 400;
+}
+@font-face {
+    font-family: "CiscoSans";
+    src: url("../font/CiscoSans-Bold.73b6a923295858e41e8636d5075bf95f.woff2");
+    font-style: normal;
+    font-weight: 700;
+}
+
+
+$primary-clr:#00a0d1;
+$primary-clr-dark:#007aa3;
+$primary-text-clr:#545454;
+$background-clr:#ffffff;
+$border-clr:#dedede;
+
+body {
+    font-family:"CiscoSans";
+    background-color:$background-clr;
+    height: 100vh;
+    margin: 0;
+    // animation: hide_scroll 0.75s;
+}
+
+header {
+    background-color: $background-clr;
+    height:4rem;
+    padding:0 1rem;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+    display:grid;
+    grid-template-columns: auto auto 1fr auto auto;
+    grid-template-areas:"logo brand product loadfile runtests";
+    font-size:1.3rem;
+    color:$primary-clr;
+
+    &__slots {
+        display:flex;
+        align-items:center;
+        height:100%;
+    }
+}
+
+.main-page {
+    background: $background-clr;
+    display:grid;
+    margin-top:3%;
+    height:83.8vh;
+    grid-template-columns:auto 50% auto;
+    grid-template-areas:"empty1 content empty2";
+    // animation: fade_in 0.75s;
+
+    &__card {
+        grid-area:content;
+        height: 95%;
+        background: $background-clr;
+        border: 2px solid $border-clr;
+        box-sizing:border-box;
+        
+        &__title {
+            position: relative;
+            left:10%;
+            bottom:2.8%;
+            border: solid $background-clr;
+            border-width: 1px 10px;
+            background: $background-clr;
+            font-weight: 200;
+            font-size: 1.5rem;
+        }
+
+        &__form {
+            display:none;
+            position: relative;
+            margin:1.4rem;
+            margin-top:0;
+            bottom:5%;
+            height:95%;
+            background: $background-clr;
+            grid-template-columns: 1fr 1fr;
+            
+            &__title {
+                font-size: 1.2rem;
+                font-weight: 200;
+                color: $primary-clr;
+                margin:auto;
+                margin-bottom:2rem;
+            }
+        }
+    }
+}
+
+.main-page__card__form.active {
+    display: grid;
+}
+
+.form {
+    position: relative;
+    width: 100%;
+
+    &__section-title {
+        font-size: 1rem;
+        font-weight: 200;
+        color: $primary-clr;
+        margin: 0rem 4rem;    
+        margin-bottom: 1rem;
+    }
+
+    &__section-title--hidden {
+        font-size: 1rem;
+        font-weight: 200;
+        color: $primary-clr;
+        margin: 0rem 4rem;    
+        margin-bottom: 1rem;
+        visibility: hidden;
+    }
+
+    &__group {
+        position:relative;
+        height:4rem;
+    }
+
+    &__input {
+        position:absolute;
+        top: 0;
+        left: 0;
+        height: 0.8rem;
+        width: 50%;
+        border: 1px solid $border-clr;
+        border-radius: 0.2rem;
+        font-family: "CiscoSans";
+        font-size: 1rem;
+        color: $primary-text-clr;
+        outline: none;
+        padding: 0.5rem;
+        background: none;
+        margin: 0rem 3rem; 
+
+        &:hover {
+            border-color: $primary-clr;
+        }
+        &:focus {
+            border-color: $primary-clr-dark;
+            border-width: 2px;
+        }
+        &__label {
+            font-size: 0.85rem;
+            position: absolute;
+            left: 0.58rem;
+            top: 0.48rem;
+            background-color: $background-clr;
+            color: #878787;
+            border: solid $background-clr;
+            border-width: 0px 3px;
+            margin: 0rem 3rem; 
+            cursor: text;
+            transition: top 200ms ease-in, 
+                        left 200ms ease-in,
+                        font-size 200ms ease-in,
+                        font-weight 200ms ease-in;
+        }
+        &__label--side {
+            position: absolute;
+            left: -1.4rem;
+            top: 0.48rem;
+            background-color: $background-clr;
+            color: $border-clr;
+            border: solid $background-clr;
+            border-width: 0px 3px;
+        }
+    }
+
+    &__checkbox {
+        background: none;
+
+        &__highlight {
+            height: 1.4rem;
+            width: 1.4rem;
+            background-color: $background-clr;
+            border-radius: 50%;
+            transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 280ms cubic-bezier(0.4, 0, 0.2, 1);
+
+        }
+    }
+
+    &__choice {
+        position:absolute;
+        top: 0;
+        left: 0;
+        height: 1.8rem;
+        width: 50%;
+        border: 1px solid $border-clr;
+        border-radius: 0.2rem;
+        font-family: "CiscoSans";
+        font-size: 1rem;
+        color: $primary-text-clr;
+        outline: none;
+        padding: 0.4rem 0.2rem 0.1rem 0.2rem;
+        background: none;
+        margin: 0rem 3rem;
+
+        &:hover {
+            border-color: $primary-clr;
+        }
+        &:focus {
+            border-color: $primary-clr-dark;
+            border-width: 2px;
+        }
+        &__label {
+            font-size: 0.85rem;
+            position: absolute;
+            font-weight: 200;
+            top: -0.45rem;
+            font-size: 0.8rem;
+            left: 0.5rem;
+            background-color: $background-clr;
+            color: #878787;
+            border: solid $background-clr;
+            border-width: 0px 3px;
+            margin: 0rem 3rem;
+        }
+    }
+}
+
+.button {
+    background-color: $primary-clr;
+    font-weight: 300;
+    font-size: 0.9rem;
+    color: $background-clr;
+    height: 2rem;
+    width: 4.5rem;
+    padding: 0.5rem;
+    display: inline-block;
+    border-radius: 0.2rem;
+    outline:none;
+    border: none;
+    cursor: pointer;
+    transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover{
+        color: $primary-clr-dark;
+        box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.button--circular {
+    background-color: $primary-clr;
+    font-weight: 300;
+    font-size: 0.9rem;
+    color: $background-clr;
+    height: 1.2rem;
+    width: 1.2rem;
+    padding: 0rem;
+    border-radius: 50%;
+    outline:none;
+    border: none;
+    cursor: pointer;
+    transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover{
+        color: $primary-clr-dark;
+        box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.formset-line {
+    background: $background-clr;
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+
+    &:hover {
+        background: rgb(0 160 209 / 5%);
+    }
+
+    &__button {
+        margin:0; 
+        width:2rem; 
+        display:inline-block;
+    }
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.no-display {
+    display: none;
+}
+
+#port1::-webkit-outer-spin-button,
+#port1::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#port2::-webkit-outer-spin-button,
+#port2::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.form__input:focus ~ .form__input__label,
+.form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label{
+    color: $primary-clr-dark;
+    font-weight: 200;
+    top: -0.45rem;
+    font-size: 0.8rem;
+    left: 0.5rem;
+}
+
+.form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label {
+    color: $border-clr;
+    top: -0.45rem;
+    font-size: 0.8rem;
+    left: 0.5rem;
+}
+
+.form__choice:hover ~ .form__choice__label {
+    color: $primary-clr;
+}
+.form__choice:focus ~ .form__choice__label {
+    color: $primary-clr-dark;
+}
+
+#cred2checkbox:hover ~ .form__checkbox__highlight {
+    color:#00a0d136;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.list-entry {
+    height:3rem; 
+    font-size:1.2rem; 
+    font-weight:200;
+    background: $background-clr;
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+    border-bottom: solid 1px $border-clr;
+    text-align: left;
+    outline: none;
+    cursor: pointer;
+    color: $primary-text-clr;
+    width: 100%;
+    border: none;
+}
+
+.active--2, .list-entry:hover {
+    background: rgb(0 160 209 / 5%);
+}
+
+.list-entry-content {
+    overflow: hidden;
+    background: $background-clr;
+    max-height: 0;
+    transition: max-height 0.2s ease-out;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 5rem;
+    background-color: $primary-text-clr;
+    color: $background-clr;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 0.2rem;
+    font-size: 0.8rem;
+    position:absolute;
+    top: 100%;
+    right: -75%;
+    z-index: 1;
+}
+
+.tooltip .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent $primary-text-clr transparent;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+@keyframes fade_in {
+    from {
+        opacity: 0;
+        transform: translateX(50rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fade_out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-50rem);
+    }
+}
+
+@keyframes fade_out_backwards {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(50rem);
+    }
+}
+
+@keyframes hide_scroll {
+    from, to {overflow: hidden;}
+}
