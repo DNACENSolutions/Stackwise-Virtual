@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block main %}
+<main>
+    <div class="main-page" style="grid-template-columns:none; grid-template-areas:none;">
+        <div class="page-content" style="margin:4rem; margin-top:0rem">
+            <div class="main-title" style="position: relative;background: #ffffff ;font-weight: 200;font-size: 1.5rem; margin-bottom:2rem;">
+                Saved Files
+            </div>
+            <div id="collapse-list">
+                <form id="form1" method="POST">
+                    {% csrf_token %}
+                    {% for file in files %}
+                        <button id="entry-{{file}}" type="button" class="list-entry" style="height:3rem; font-size:1.2rem; font-weight:200;"> {{file}} </button>
+                        <div id="content-{{file}}" class="list-entry-content" style="list-style: none; margin:0.5rem;">
+                            <input id="create-{{file}}" class="button" type="submit" name="create" value="Create StackWise-Virtual" style="display:block; width:15rem; margin: 0.2rem;"/>
+                            <input id="delete-{{file}}" class="button" type="submit" name="delete" value="Delete StackWise-Virtual" style="display:block; width:15rem; margin: 0.2rem;"/>
+                            <input id="update-{{file}}" class="button" type="submit" name="update" value="Update StackWise-Virtual" style="display:block; width:15rem; margin: 0.2rem;"/>
+                        </div>                       
+                    {% endfor %}
+                    <input id="file-form" value=" " name="file" style="display: none"/>
+                </form>
+            </div> 
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const list_entry = document.getElementsByClassName('list-entry')
+    for (i=0; i < list_entry.length; i++) {
+        list_entry[i].addEventListener('click', function() {
+            this.classList.toggle("active")
+            const content = this.nextElementSibling
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null
+            }
+            else {
+                content.style.maxHeight = content.scrollHeight + "px"
+            }
+
+            if( this.classList.contains("active")) {
+                const submit = document.getElementById("file-form")
+                submit.setAttribute('value', this.id.replace("entry-", ""))
+            }
+        })
+    }
+</script>
+{% endblock %}

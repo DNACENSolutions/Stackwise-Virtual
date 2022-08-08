@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+    <div class="main-page__card__title" style="width:16rem;"> Testbed YAML Preview </div>
+{% endblock %}
+
+{% block content %}
+    <div class="iframe-container" style="grid-template-rows: auto 0.1fr; grid-template-areas:'iframe''buttons'; display: grid; position: relative; margin: 1.4rem; bottom: 5.7%; height: 92%;">
+        <iframe src={% url 'testbed-file' %} width="500rem" height="450rem" frameBorder="0" style="grid-area:iframe; margin-left:2.9rem; outline: 3px double #dedede; box-shadow: inset 0 0 0.2rem rgba(0, 0, 0, 0.2);"></iframe>
+        <div style="grid-area:buttons; position:relative;">
+            <form method="POST" style="margin-left:18rem">
+                {% csrf_token %}
+                <button class="button" type="button" id="backbtn" style="position:absolute; bottom:0; left:0;"> Back </button>
+                <input class="button" type="submit" name="savebtn" value="Save" style="position:absolute; bottom:0; right:0;"/>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const back = document.getElementById('backbtn')
+    back.addEventListener('click', previous_page)
+
+    function previous_page(event) {
+        history.back()
+    }
+</script>
+{% endblock %}
