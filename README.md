@@ -121,6 +121,19 @@ Steps to run job from docker image:
 1.  Go to the below link and download the docker image.
       https://hub.docker.com/repository/docker/maranjega/docker_images
 2.  Find "Installing Docker Engine in CENTOS 7" from the below link for installing docker engine.
-      https://wiki.cisco.com/display/EDPEIXOT/Solutions+PyatsDocker+Build+procedure    
+      https://docs.docker.com/engine/install/centos/   
 3. Once installed the docker engine,run the below command from your linux machine.
     " docker run --rm maranjega/docker_images:solution-eng-stackwise-jun15 pyats run job /pyats/sol_eng_stackwise_virtual/job/svl_update_job.py --testbed-file /pyats/sol_eng_stackwise_virtual/testbed/9500_sv_tb.yaml "
+    
+STEPS to add new testbed file to existing docker image and run :
+
+1. Mount the local testbed directory in docker with the below command 
+[maran@maran Stackwise-Virtual]$ docker run -d -it --name devtest1 --mount type=bind,source=/home/maran/Stackwise-Virtual/testbed,target=/pyats/sol_eng_stackwise_virtual/testbed maranjega/docker_images:solution-eng-stackwise-jun15
+63d007b1b2cf8e65431516fe6647b07afae8647e78b1e4b75b1af42487ec6fbf
+
+2. To run the job from the container bash follow the below steps.
+[maran@maran Stackwise-Virtual]$ docker exec -it devtest1 bash
+root@812e50740447:/pyats#
+root@812e50740447:/pyats# source bin/activate
+(pyats) root@812e50740447:/pyats# cd sol_eng_stackwise_virtual
+(pyats) root@812e50740447:/pyats/sol_eng_stackwise_virtual# pyats run job /pyats/sol_eng_stackwise_virtual/job/svl_update_job.py --testbed-file /pyats/sol_eng_stackwise_virtual/testbed/test.yaml
