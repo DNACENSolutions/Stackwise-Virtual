@@ -18,7 +18,7 @@ def testbed_yaml_preview(request):
 
         new_testbed = TestbedFiles()
         total_files = TestbedFiles.objects.count()
-        new_testbed.save_file(f"testbed-6.yaml")
+        new_testbed.save_file(f"testbed-{total_files}.yaml")
         new_testbed.save()
         return redirect('saved-files')
 

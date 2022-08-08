@@ -322,7 +322,7 @@ header {
 
 .form__input:focus ~ .form__input__label,
 .form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label{
-    color: $primary-clr-dark;
+    color: #878787;
     font-weight: 200;
     top: -0.45rem;
     font-size: 0.8rem;
@@ -330,7 +330,7 @@ header {
 }
 
 .form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label {
-    color: $border-clr;
+    color: #878787;
     top: -0.45rem;
     font-size: 0.8rem;
     left: 0.5rem;

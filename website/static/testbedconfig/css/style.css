@@ -288,7 +288,7 @@ header__slots {
 }
 
 .form__input:not(:-moz-placeholder-shown).form__input:not(:focus) ~ .form__input__label {
-  color: #007aa3;
+  color: #878787;
   font-weight: 200;
   top: -0.45rem;
   font-size: 0.8rem;
@@ -296,7 +296,7 @@ header__slots {
 }
 
 .form__input:not(:-ms-input-placeholder).form__input:not(:focus) ~ .form__input__label {
-  color: #007aa3;
+  color: #878787;
   font-weight: 200;
   top: -0.45rem;
   font-size: 0.8rem;
@@ -305,7 +305,7 @@ header__slots {
 
 .form__input:focus ~ .form__input__label,
 .form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label {
-  color: #007aa3;
+  color: #878787;
   font-weight: 200;
   top: -0.45rem;
   font-size: 0.8rem;
@@ -313,21 +313,21 @@ header__slots {
 }
 
 .form__input:not(:-moz-placeholder-shown).form__input:not(:focus) ~ .form__input__label {
-  color: #dedede;
+  color: #878787;
   top: -0.45rem;
   font-size: 0.8rem;
   left: 0.5rem;
 }
 
 .form__input:not(:-ms-input-placeholder).form__input:not(:focus) ~ .form__input__label {
-  color: #dedede;
+  color: #878787;
   top: -0.45rem;
   font-size: 0.8rem;
   left: 0.5rem;
 }
 
 .form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label {
-  color: #dedede;
+  color: #878787;
   top: -0.45rem;
   font-size: 0.8rem;
   left: 0.5rem;
