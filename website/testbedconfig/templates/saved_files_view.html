@@ -3,26 +3,41 @@
 {% block main %}
 <main>
     <div class="main-page" style="grid-template-columns:none; grid-template-areas:none;">
-        <div class="page-content" style="margin:4rem; margin-top:0rem">
+        <div id="files" class="page-content" style="margin:4rem; margin-top:0rem; margin-bottom:0rem;">
             <div class="main-title" style="position: relative;background: #ffffff ;font-weight: 200;font-size: 1.5rem; margin-bottom:2rem;">
                 Saved Files
             </div>
             <div id="collapse-list">
-                <form id="form1" method="POST">
-                    {% csrf_token %}
-                    {% for file in files %}
-                        <button id="entry-{{file}}" type="button" class="list-entry" style="height:3rem; font-size:1.2rem; font-weight:200;"> {{file}} </button>
-                        <div id="content-{{file}}" class="list-entry-content" style="list-style: none; margin:0.5rem;">
-                            <input id="create-{{file}}" class="button" type="submit" name="create" value="Create StackWise-Virtual" style="display:block; width:15rem; margin: 0.2rem;"/>
-                            <input id="delete-{{file}}" class="button" type="submit" name="delete" value="Delete StackWise-Virtual" style="display:block; width:15rem; margin: 0.2rem;"/>
-                            <input id="update-{{file}}" class="button" type="submit" name="update" value="Update StackWise-Virtual" style="display:block; width:15rem; margin: 0.2rem;"/>
-                        </div>                       
-                    {% endfor %}
-                    <input id="file-form" value=" " name="file" style="display: none"/>
-                </form>
+                {% for file in files %}
+                    <button id="entry-{{file}}" type="button" class="list-entry" style="height:3rem; font-size:1.2rem; font-weight:200;"> {{file}} </button>
+                    <div id="content-{{file}}" class="list-entry-content" style="list-style: none; margin:0.5rem;">
+                        <button id="create-{{file}}" class="button" type="button" data-file="{{file}}" data-name="create" style="display:block; width:15rem; margin: 0.2rem;">Create StackWise-Virtual</button>
+                        <button id="delete-{{file}}" class="button" type="button" data-file="{{file}}" data-name="delete" style="display:block; width:15rem; margin: 0.2rem;">Delete StackWise-Virtual</button>
+                        <button id="update-{{file}}" class="button" type="button" data-file="{{file}}" data-name="update" style="display:block; width:15rem; margin: 0.2rem;">Update StackWise-Virtual</button>
+                    </div>                       
+                {% endfor %}
+                <input id="file-form" value=" " name="file" style="display: none"/>
             </div> 
-            </div>
         </div>
+        <div id="running-tasks" class="no-display" style="margin:4rem; margin-top:0rem">
+            <div class="main-title" style="position: relative;background: #ffffff ;font-weight: 200;font-size: 1.5rem;">
+                Tasks
+            </div>
+            <table style="border-spacing: 1.2rem;">
+                <thead>
+                    <tr class="table-header" style="color:#545454;">
+                      <th>ID</th>
+                      <th>Testbed</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                      <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody id="tasks">
+                </tbody>
+            </table> 
+        </div>
+        <button id="switchpage" type="button" class="button--2" style="width:7rem; align-self:flex-end; justify-self:center; margin:1rem;"> View Tasks </button>
     </div>
 </main>
 {% endblock %}
@@ -46,6 +61,84 @@
                 submit.setAttribute('value', this.id.replace("entry-", ""))
             }
         })
+    }
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    $('.button').on('click', function() {
+        $.ajax({
+            url: '{% url "run-task" %}',
+            data: {job: $(this).data('name'),
+                   file: $(this).data('file') },
+            method: 'POST',
+        })
+        .done((res) => {
+            getStatus(res.task_id, $(this).data('file'));
+            $("#switchpage").click()
+        })
+        .fail((err) => {
+            console.log(err);
+            $("#switchpage").click()
+        });
+        });
+
+    function getStatus(taskID) {
+        $.ajax({
+            url: `/get-status/${taskID}/`,
+            method: 'GET'
+        })
+        .done((res) => {
+            const html = `
+            <tr style="height:3rem; font-size:1rem; font-weight:200; border-bottom:solid 1px $border-clr;">
+                <td>${res.task_id}</td>
+                <td><button type="button" class="table-button" data-file="${res.file}">${res.file}</button></td>
+                <td>${res.task_status}</td>
+                <td>${res.task_date}</td>
+                <td><button type="button" class="table-button" data-file="${res.task_result}">${res.task_result}</button></td>
+            </tr>`
+            $('#tasks').prepend(html);
+
+            const taskStatus = res.task_status;
+
+            if (taskStatus === 'SUCCESS' || taskStatus === 'FAILURE') return false;
+            setTimeout(function() {
+            getStatus(res.task_id);
+            }, 1000);
+        })
+        .fail((err) => {
+            console.log(err)
+        });
+        }
+</script>
+<script>
+    const saved = document.getElementById('files')
+    const running = document.getElementById('running-tasks')
+    const switchbtn = document.getElementById('switchpage')
+    switchbtn.addEventListener('click', switch_page)
+    function switch_page(event) {
+        if (running.className == 'no-display') {
+            running.setAttribute('class', 'page-content')
+            saved.setAttribute('class', 'no-display')
+            switchbtn.style.width = '9rem'
+            switchbtn.innerText = 'View Saved Files'
+        }
+        else if (running.className == 'page-content') {
+            running.setAttribute('class', 'no-display')
+            saved.setAttribute('class', 'page-content')
+            switchbtn.style.width = '9rem'
+            switchbtn.innerText = 'View Tasks'
+        }
+    }
+</script>
+<script>
+    const elements = document.getElementsByClassName('table-button')
+
+    for (var i = 0; i < elements.length; i++) {
+    elements[i].addEventListener('click', show_file);
+    }
+    
+    function show_file(event) {
+        console.log(this)
     }
 </script>
 {% endblock %}

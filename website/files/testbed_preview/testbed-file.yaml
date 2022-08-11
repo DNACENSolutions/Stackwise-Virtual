@@ -1,0 +1,64 @@
+devices:
+  SWITCH-1:
+    alias: f
+    connections:
+      a:
+        arguments:
+          learn_hostname: true
+        ip: f
+        port: 22
+        protocol: SSH
+      defaults:
+        class: unicon.Unicon
+    custom:
+      switchnumber: '1'
+      switchpriority: '15'
+    os: iosxe
+    passwords: '%{testbed.passwords}'
+    tacacs: '%{testbed.tacacs}'
+    type: IOS-XE
+  SWITCH-2:
+    alias: f
+    connections:
+      a:
+        arguments:
+          learn_hostname: true
+        ip: f
+        port: 22
+        protocol: SSH
+    custom:
+      switchnumber: '2'
+      switchpriority: '10'
+    os: iosxe
+    passwords: '%{testbed.passwords}'
+    tacacs: '%{testbed.tacacs}'
+    type: IOS-XE
+testbed:
+  custom:
+    switchstackinggroups:
+    - domainNumber: 3
+      numberofswitches: 2
+      platformType: '9600'
+      switchs:
+      - SWITCH-1
+      - SWITCH-2
+  name: STACKWISE-VIRTUAL
+  passwords:
+    enable: f
+    line: f
+    tacacs: f
+  tacacs:
+    login_prompt: 'Username:'
+    password_prompt: 'Password:'
+    username: f
+topology:
+  SWITCH-1:
+    interfaces:
+      TwentyFiveGigE1/f:
+        link: DAD-LINK-1
+        type: ethernet
+  SWITCH-2:
+    interfaces:
+      TwentyFiveGigE2/f:
+        link: DAD-LINK-1
+        type: ethernet

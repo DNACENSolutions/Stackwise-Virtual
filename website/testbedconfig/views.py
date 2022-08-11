@@ -1,19 +1,21 @@
 from email.mime import base
 from multiprocessing.dummy import active_children
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 from .forms import ConfigForm, LinksConfigForm
 from django.forms import formset_factory
 from pathlib import Path
 import yaml
 from .models import TestbedFiles
-from multiprocessing import Process, current_process, active_children
-from . import tasks
+from celery.result import AsyncResult
+from .tasks import create_SWV
+from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
 
 def testbed_yaml_preview(request):
-    base_dir = Path(__file__).resolve().parent
+    base_dir = Path(__file__).resolve().parent.parent
     if 'savebtn' in request.POST:
-        with open(base_dir / "testbed-file.yaml", "w") as f:
+        with open(base_dir / "files" / "testbed_preview" / "testbed-file.yaml", "w") as f:
             yaml.dump(request.session["current-testbed"], f, sort_keys=True, default_flow_style=False)
 
         new_testbed = TestbedFiles()
@@ -25,21 +27,21 @@ def testbed_yaml_preview(request):
     return render(request, 'testbed_yaml_preview.html')
 
 def testbed_file(request):
-    base_dir = Path(__file__).resolve().parent
-    with open(base_dir / "file.txt") as g:
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    with open(base_dir / "website" / "files" / "testbed_preview" / "preview.txt") as g:
         response = HttpResponse(g)
         response["Content-Type"] = 'text/plain'
-        response['Content-Disposition'] = 'inline;filename=file.txt'   
+        response['Content-Disposition'] = 'inline;filename=preview.txt'   
     return response
 
 def form_view(request):
-    base_dir = Path(__file__).resolve().parent
+    base_dir = Path(__file__).resolve().parent.parent.parent
 
     form = formset_factory(LinksConfigForm, extra=0)
     formset = form(request.POST or None)
     form = ConfigForm(request.POST or None)
     if form.is_valid() and formset.is_valid():
-        with open(base_dir / "9600_sv_tb.yaml") as f:
+        with open(base_dir / "testbed" / "9600_sv_tb.yaml") as f:
             testbed = yaml.safe_load(f)
             testbed["testbed"]["tacacs"]["username"] = form.cleaned_data["username"]
             testbed["testbed"]["passwords"]["tacacs"] = form.cleaned_data["password"]
@@ -103,7 +105,7 @@ def form_view(request):
 
             request.session['current-testbed'] = testbed
 
-        with open(base_dir / "file.txt", "w") as g:
+        with open(base_dir / "website" / "files" / "testbed_preview" / "preview.txt", "w") as g:
             yaml.dump(testbed, g, sort_keys=True, default_flow_style=False)
 
         return redirect("testbed-preview")
@@ -117,30 +119,39 @@ def saved_files_view(request):
     for object in list:
         name = object.file.name
         files_list.append(name.split("/")[1])
-
-    # delete_SWV = Process(target=tasks.delete_SWV())
-    # update_SWV = Process(target=tasks.update_SWV())
-
-    running = None
-
-    if 'create' in request.POST:
-        file = f"./website/files/testbeds/{request.POST.get('file')}"
-        create_SWV = Process(target=tasks.create_SWV, args=(file,))
-        # create_SWV.start()
-        # create_SWV.id = f'SVLTask-create-{request.POST.get("file")}'
-        running = f'SVLTask-create-{request.POST.get("file")}'
-
-    if 'delete' in request.POST:
-        file = f"./website/files/testbeds/{request.POST.get('file')}"
-        delete_SWV = Process(target=tasks.delete_SWV, args=(file,))
-
-    if 'update' in request.POST:
-        file = f"./website/files/testbeds/{request.POST.get('file')}"
-        update_SWV = Process(target=tasks.update_SWV, args=(file,))
-
-    active = current_process()
-    print(active)
-
-    print(running)
-    context = {'files': files_list, 'running': running}
+        
+    context = {'files': files_list}
     return render(request, 'saved_files_view.html', context)
+
+@csrf_exempt
+def run_task(request):
+    if request.POST:
+        if request.POST.get('job') == 'create':
+            id = f"SVLTask-{request.POST.get('job')}-{request.POST.get('file').replace('.yaml', '')}"
+            task = create_SWV.apply_async(args=[request.POST.get('file'), id], task_id=id)
+            return JsonResponse({'task_id': task.id}, status=200)
+
+@csrf_exempt
+def get_status(request, task_id):
+    task_result = AsyncResult(task_id)
+    file = task_id.split('-')[2:]
+    file = "-".join(file)
+
+    now = datetime.now()
+    task_date = now.strftime("%d/%m/%Y %H:%M:%S")
+
+    result = {
+        "file": file + ".yaml", 
+        "task_id": task_id,
+        "task_status": task_result.status,
+        "task_date": task_date,
+        "task_result": task_id + '.txt',
+    }
+
+    return JsonResponse(result, status=200)
+
+@csrf_exempt
+def show_file(request, file):
+    file_show = open(file)
+    response = FileResponse(file_show)
+    return response
