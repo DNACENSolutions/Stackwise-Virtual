@@ -66,7 +66,7 @@ header {
     background: $background-clr;
     display:grid;
     margin-top:3%;
-    height:83.8vh;
+    min-height:83.8vh;
     grid-template-columns:auto 50% auto;
     grid-template-areas:"empty1 content empty2";
     // animation: fade_in 0.75s;
@@ -264,6 +264,27 @@ header {
     }
 }
 
+.button--2 {
+    background-color: $primary-clr;
+    font-weight: 300;
+    font-size: 0.9rem;
+    color: $background-clr;
+    height: 2rem;
+    width: 4.5rem;
+    padding: 0.5rem;
+    display: inline-block;
+    border-radius: 0.2rem;
+    outline:none;
+    border: none;
+    cursor: pointer;
+    transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover{
+        color: $primary-clr-dark;
+        box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
+    }
+}
+
 .button--circular {
     background-color: $primary-clr;
     font-weight: 300;
@@ -322,7 +343,7 @@ header {
 
 .form__input:focus ~ .form__input__label,
 .form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label{
-    color: $primary-clr-dark;
+    color: #878787;
     font-weight: 200;
     top: -0.45rem;
     font-size: 0.8rem;
@@ -330,7 +351,7 @@ header {
 }
 
 .form__input:not(:placeholder-shown).form__input:not(:focus) ~ .form__input__label {
-    color: $border-clr;
+    color: #878787;
     top: -0.45rem;
     font-size: 0.8rem;
     left: 0.5rem;
@@ -408,6 +429,36 @@ header {
   visibility: visible;
 }
 
+.table-header {
+    font-size: 1rem;
+    font-weight: 200;
+    color: $primary-clr;
+    margin: 0rem 4rem;    
+    margin-bottom: 1rem;
+}
+
+th {
+    padding: 1rem;
+    padding-bottom: 0rem;
+}
+
+td {
+    padding: 1rem;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+}
+
+.table-button {
+    outline: none;
+    background: none;
+    color: $primary-clr;
+    font-size: 1rem;
+    font-weight: 200;
+    border: none;
+    &:hover {
+        color: $primary-clr-dark;
+    }
+}
 @keyframes fade_in {
     from {
         opacity: 0;
