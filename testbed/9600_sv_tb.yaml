@@ -43,11 +43,11 @@ devices:
             defaults: {class: 'unicon.Unicon'}
             a:
                 #Device Console Access Primary RP. Always have learn_hostname: True
-                #protocol: telnet
-                protocol: ssh
-                ip: 10.195.243.101
-                #ip: 172.21.236.76
-                #port: 2003
+                protocol: telnet
+                #protocol: ssh
+                #ip: 10.195.243.101
+                ip: 172.21.236.76
+                port: 2003
                 arguments:
                     learn_hostname: True
             #if it is a dual RP device Define the second console under b:
@@ -69,11 +69,11 @@ devices:
         passwords: "%{testbed.passwords}"
         connections:
             a:
-                #protocol: telnet
-                #ip: 172.21.236.76
-                #port: 2004
-                protocol: ssh
-                ip: 10.195.243.102
+                protocol: telnet
+                ip: 172.21.236.76
+                port: 2004
+                #protocol: ssh
+                #ip: 10.195.243.102
                 arguments:
                     learn_hostname: True
 #Topology Section

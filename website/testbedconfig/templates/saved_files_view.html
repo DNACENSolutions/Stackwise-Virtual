@@ -14,6 +14,7 @@
                         <button id="create-{{file}}" class="button" type="button" data-file="{{file}}" data-name="create" style="display:block; width:15rem; margin: 0.2rem;">Create StackWise-Virtual</button>
                         <button id="delete-{{file}}" class="button" type="button" data-file="{{file}}" data-name="delete" style="display:block; width:15rem; margin: 0.2rem;">Delete StackWise-Virtual</button>
                         <button id="update-{{file}}" class="button" type="button" data-file="{{file}}" data-name="update" style="display:block; width:15rem; margin: 0.2rem;">Update StackWise-Virtual</button>
+                        <button id="show-{{file}}" class="button" type="button" data-file="{{file}}" data-name="show" style="display:block; width:15rem; margin: 0.2rem;">Show File</button>
                     </div>                       
                 {% endfor %}
                 <input id="file-form" value=" " name="file" style="display: none"/>
@@ -96,14 +97,14 @@
                 <td>${res.task_date}</td>
                 <td><button type="button" class="table-button" data-file="${res.file}">${res.task_result}</button></td>
             </tr>`
-            $('#tasks').prepend(html);
-
+            //$('#tasks').prepend(html)
+            $('#tasks').replaceWith(html)
             const taskStatus = res.task_status;
 
             if (taskStatus === 'SUCCESS' || taskStatus === 'FAILURE') return false;
             setTimeout(function() {
             getStatus(res.task_id);
-            }, 1000);
+            }, 10000);
         })
         .fail((err) => {
             console.log(err)

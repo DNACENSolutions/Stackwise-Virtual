@@ -1,64 +1,76 @@
-devices:
-  SWITCH-1:
-    alias: f
-    connections:
-      a:
-        arguments:
-          learn_hostname: true
-        ip: f
-        port: 22
-        protocol: SSH
-      defaults:
-        class: unicon.Unicon
-    custom:
-      switchnumber: '1'
-      switchpriority: '15'
-    os: iosxe
-    passwords: '%{testbed.passwords}'
-    tacacs: '%{testbed.tacacs}'
-    type: IOS-XE
-  SWITCH-2:
-    alias: f
-    connections:
-      a:
-        arguments:
-          learn_hostname: true
-        ip: f
-        port: 22
-        protocol: SSH
-    custom:
-      switchnumber: '2'
-      switchpriority: '10'
-    os: iosxe
-    passwords: '%{testbed.passwords}'
-    tacacs: '%{testbed.tacacs}'
-    type: IOS-XE
 testbed:
+  name: STACKWISE-VIRTUAL
+  tacacs:
+    login_prompt: 'Username:'
+    password_prompt: 'Password:'
+    username: sampleuser
+  passwords:
+    tacacs: Sample#123
+    enable: Cisco#123
+    line: Cisco#123
   custom:
     switchstackinggroups:
-    - domainNumber: 3
-      numberofswitches: 2
+    - numberofswitches: 2
+      domainNumber: 3
       platformType: '9600'
       switchs:
       - SWITCH-1
       - SWITCH-2
-  name: STACKWISE-VIRTUAL
-  passwords:
-    enable: f
-    line: f
-    tacacs: f
-  tacacs:
-    login_prompt: 'Username:'
-    password_prompt: 'Password:'
-    username: f
+devices:
+  SWITCH-1:
+    os: iosxe
+    type: IOS-XE
+    custom:
+      switchnumber: '1'
+      switchpriority: '15'
+    alias: Host1
+    tacacs: '%{testbed.tacacs}'
+    passwords: '%{testbed.passwords}'
+    connections:
+      defaults:
+        class: unicon.Unicon
+      a:
+        protocol: SSH
+        ip: 10.195.243.101
+        arguments:
+          learn_hostname: true
+        port: 22
+  SWITCH-2:
+    os: iosxe
+    type: IOS-XE
+    custom:
+      switchnumber: '2'
+      switchpriority: '10'
+    alias: Host2
+    tacacs: '%{testbed.tacacs}'
+    passwords: '%{testbed.passwords}'
+    connections:
+      a:
+        protocol: SSH
+        ip: 10.195.243.102
+        arguments:
+          learn_hostname: true
+        port: 22
 topology:
   SWITCH-1:
     interfaces:
-      TwentyFiveGigE1/f:
+      TwentyFiveGigE1/1/0/48:
         link: DAD-LINK-1
+        type: ethernet
+      TwentyFiveGigE1/1/0/31:
+        link: DAD-LINK-2
+        type: ethernet
+      TwentyFiveGigE1/1/0/25:
+        link: DAD-LINK-3
         type: ethernet
   SWITCH-2:
     interfaces:
-      TwentyFiveGigE2/f:
+      TwentyFiveGigE2/1/0/48:
         link: DAD-LINK-1
+        type: ethernet
+      TwentyFiveGigE2/1/0/31:
+        link: DAD-LINK-2
+        type: ethernet
+      TwentyFiveGigE2/1/0/25:
+        link: DAD-LINK-3
         type: ethernet

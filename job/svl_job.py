@@ -22,11 +22,11 @@ __contact__ = ['pawansi@cisco.com']
 __credits__ = ['list', 'of', 'credit']
 __version__ = 1.0
 
-import io
 import os
 import time
-from pyats.easypy import run
 from pyats.easypy import Task
+#from pyats.easypy import 
+from pyats.topology import loader
 # compute the script path from this location
 SCRIPT_PATH = os.path.dirname("./")
 MAX_TASK_WAIT_TIME=3600
@@ -42,6 +42,28 @@ def main(runtime):
         print(svl_pair)
         task1 = Task(testscript = script_name,
                         runtime=runtime,
+                        svl_pair=svl_pair,
+                        taskid = f"SVLTask-{script_name.split('/')[-1]}-{svl_pair['platformType']}:{svl_pair['switchs']}")
+        job_list.append(task1)
+        # start the task
+        task1.start()
+        time.sleep(1)
+
+    # wait for a max runtime of 60*5 seconds = 5 minutes
+    for task1 in job_list:
+        result = task1.wait(MAX_TASK_WAIT_TIME)
+        print(result)
+
+def run_script(testbed_file, option="create"):
+    '''run the script'''
+    if option == "create":
+        script_name = os.path.join(SCRIPT_PATH,'scripts/stackwise_virtual.py')
+    
+    testbed = loader.load(testbed_file)
+    for svl_pair in testbed.custom['switchstackinggroups']:
+        print(svl_pair)
+        task1 = Task(testscript = script_name,
+                        testbed=testbed,
                         svl_pair=svl_pair,
                         taskid = f"SVLTask-{script_name.split('/')[-1]}-{svl_pair['platformType']}:{svl_pair['switchs']}")
         job_list.append(task1)
