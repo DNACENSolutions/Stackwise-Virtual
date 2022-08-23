@@ -89,7 +89,7 @@ def form_view(request):
                     interfaceprefix1 = forms.cleaned_data["interfaceprefix1"]
                     interfaceprefix2 = forms.cleaned_data["interfaceprefix2"]
                     interface1 = forms.cleaned_data["interfacechoice"] + interfaceprefix1 + forms.cleaned_data["interface1"]
-                    interface2 = forms.cleaned_data["interfacechoice1"] + interfaceprefix2 + forms.cleaned_data["interface2"]
+                    interface2 = forms.cleaned_data["interfacechoice"] + interfaceprefix2 + forms.cleaned_data["interface2"]
                     if (forms.cleaned_data["linktype"] == 'SVL'):
                         interfaces1[interface1] = {'link': f"STACKWISEVIRTUAL-LINK-{sv_links}", 'type': 'ethernet'}
                         interfaces2[interface2] = {'link': f"STACKWISEVIRTUAL-LINK-{sv_links}", 'type': 'ethernet'}
