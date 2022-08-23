@@ -13,7 +13,7 @@ from unicon.utils import Utils as unicon_utils
 SVLVERSION_9500="16.8.1"
 SVLVERSION_9400="16.9.1"
 SVLVERSION_9600="16.12.1"
-MAXRELOADTIMEOUT=300
+MAXRELOADTIMEOUT=400
 EXCEPTIONRELOADTIMEWAIT=120
 PLATFORMVERSIONREFERENCE=[
     {   "platform": ["C9500-40X","C5900-16X","C5900-12Q","C9500-24Q"],
@@ -326,7 +326,7 @@ class StackWiseVirtual(object):
             return False
         if stackpair["status"]:
             Logger.warning("The switch is already a stackwise Virtual. Remove the existing stackwise virtual configs to run this script.")
-            return False
+            #return False
         else:
             switches=[stackpair["switch1"], stackpair["switch2"]]
             dev_details=[]
@@ -380,15 +380,21 @@ class StackWiseVirtual(object):
                     self.disconnect_from_stackpair(stackpair)
                 if not self.testbed.devices[stackpair["switch1"]].connected:
                     dev_detail = uni_connect(self.testbed.devices[stackpair["switch1"]])
-                    #.connect()
                 output = self.testbed.devices[stackpair["switch1"]].execute("show stackwise-virtual neighbors")
                 output1 = self.testbed.devices[stackpair["switch1"]].execute("show stackwise-virtual")
                 stackstatus = re.findall('Stackwise Virtual : Enabled',output1)
                 stackpair["status"]=False
                 if stackstatus:
-                    stackstatus = re.findall('\d\s+\d\s+\S+\s+\S+',output)
-                    if stackstatus:
-                        stackpair["status"] = True
+                    output2 = output.split("\n")
+                    for line in output2:
+                        print(line)
+                        stackstatus1 = re.findall('\d[\s\t]+\d[\s\t]+[\w/]+[\s\t]+[\w/]+',line)
+                        if stackstatus1:
+                            stackpair["status"]=True
+                            break
+                    print(stackpair["status"])
+                    if stackpair["status"]:
+                        print("Setting stackwise virtual to True")
                         self.testbed.devices[stackpair["switch1"]].disconnect()
                         self.testbed.devices[stackpair["switch2"]].disconnect()
                         uni_connect(stackpair['stackwiseVirtualDev'])
@@ -401,6 +407,7 @@ class StackWiseVirtual(object):
                     if not self.testbed.devices[stackpair["switch2"]].connected:
                         dev_detail = self.testbed.devices[stackpair["switch2"]].connect()
                     stackpair["status"] = False
+                    return True
             except:
                 try:
                     Logger.error(traceback.format_exc())
@@ -427,7 +434,10 @@ class StackWiseVirtual(object):
         if not result and retry > 0:
             time.sleep(120)
             self.disconnect_from_stackpair(stackpair)
+            self.testbed.devices[stackpair["switch1"]].disconnect()
+            self.testbed.devices[stackpair["switch2"]].disconnect()
             time.sleep(10)
+            stackpair['stackwiseVirtualDev'].connected = False
             return self.connect_to_stackpair(stackpair, retry=retry-1)
         return result
 
