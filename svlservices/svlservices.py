@@ -13,7 +13,7 @@ from unicon.utils import Utils as unicon_utils
 SVLVERSION_9500="16.8.1"
 SVLVERSION_9400="16.9.1"
 SVLVERSION_9600="16.12.1"
-MAXRELOADTIMEOUT=400
+MAXRELOADTIMEOUT=600
 EXCEPTIONRELOADTIMEWAIT=120
 PLATFORMVERSIONREFERENCE=[
     {   "platform": ["C9500-40X","C5900-16X","C5900-12Q","C9500-24Q"],
@@ -200,12 +200,13 @@ class StackWiseVirtual(object):
                     dev_stack["switch{}".format(count)] = switch
                     count=count+1
                     dev_stack['pairinfo'] = pair
-                if self.testbed.devices[dev_stack["switch1"]].custom.switchnumber == 1:
+                if int(self.testbed.devices[dev_stack["switch1"]].custom.switchnumber) == 1:
                     switch1 = "switch1"
                     switch2 = "switch2"
                 else:
                     switch1 = "switch2"
                     switch2 = "switch1"
+                
                 dev_stack['stackwiseVirtualDev'] =  Device(name=self.testbed.devices[dev_stack[switch1]].name+"svl",
                             type=self.testbed.devices[dev_stack[switch1]].type,
                             os=self.testbed.devices[dev_stack[switch1]].os,
@@ -409,14 +410,22 @@ class StackWiseVirtual(object):
                     stackpair["status"] = False
                     return True
             except:
+                self.testbed.devices[stackpair["switch1"]].disconnect()
+                self.testbed.devices[stackpair["switch2"]].disconnect()
+                stackpair['stackwiseVirtualDev'].disconnect()
+                if retry > 0:
+                    time.sleep(30)
+                    return self.connect_to_stackpair(stackpair, retry = retry-1)
+                else:
+                    Logger.error("Could not connect to devices on both switches, try to proceed with as a single stack.")
                 try:
                     Logger.error(traceback.format_exc())
                     uni_connect(stackpair['stackwiseVirtualDev'])
-                    #.connect()
+                    Logger.info("Connected to stackwise virtual and setting status to True")
                     stackpair["status"] = True
                     return True
                 except:
-                    Logger.error("Could not connect to the device")
+                    Logger.error("Could not connect to stackwise virtual, can not proceed.")
                     Logger.error(traceback.format_exc())
                     result=False
         else:
