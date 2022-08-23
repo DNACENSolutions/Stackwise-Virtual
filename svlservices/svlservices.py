@@ -327,7 +327,7 @@ class StackWiseVirtual(object):
             return False
         if stackpair["status"]:
             Logger.warning("The switch is already a stackwise Virtual. Remove the existing stackwise virtual configs to run this script.")
-            #return False
+            return False
         else:
             switches=[stackpair["switch1"], stackpair["switch2"]]
             dev_details=[]
@@ -419,7 +419,7 @@ class StackWiseVirtual(object):
                 else:
                     Logger.error("Could not connect to devices on both switches, try to proceed with as a single stack.")
                 try:
-                    Logger.error(traceback.format_exc())
+                    #Logger.error(traceback.format_exc())
                     uni_connect(stackpair['stackwiseVirtualDev'])
                     Logger.info("Connected to stackwise virtual and setting status to True")
                     stackpair["status"] = True
