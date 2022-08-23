@@ -8,7 +8,75 @@
 {% block content %}
 <form multi-step-form method="POST">
     {% csrf_token %}
-    <div data-form-step="0" class="main-page__card__form" style="grid-template-rows: 0.1fr auto 0.1fr 2.98fr; grid-template-areas: 'title title' 'cred1 cred2' 'checkbox checkbox' 'buttons buttons';">
+
+    <div data-form-step="0" class="main-page__card__form" style="grid-template-rows: 0.1fr auto 1fr; grid-template-areas: 'title title' 'switch1 switch2' 'buttons buttons';">
+        <div class="main-page__card__form__title" style="grid-area:title; margin-bottom:1rem;"> Devices </div>
+        <div id="switch1" style="grid-area:switch1;">
+            <div class="form__section-title"> Switch 1 </div>
+            <div class="form__group">
+                {{form.hostname1}}
+                <label class="form__input__label" for="hostname1"> Hostname </label>
+            </div>
+            <div class="form__group">
+                {{form.protocol1}}
+                <label class="form__choice__label" for="protocol1"> Protocol </label>
+            </div>    
+            <div class="form__group">
+                {{form.ipaddress1}}
+                <label class="form__input__label" for="ipaddress1"> IP Address </label>
+            </div>
+            <div class="form__group">
+                {{form.port1}}
+                <label class="form__input__label" for="port1"> Port Number </label>
+            </div>
+            <div class="form__group">
+                {{form.number1}}
+                <label class="form__choice__label" for="number1"> Switch Number </label>
+            </div>
+            <div class="form__group">
+                {{form.priority1}}
+                <label class="form__choice__label" for="priority1"> Switch Priority </label>
+            </div>
+            <div class="form__group">
+                {{form.platform}}
+                <label class="form__choice__label" for="platform"> Platform Type </label>
+            </div>
+        </div>
+
+        <div id="switch2" style= "grid-area:switch2;">
+            <div class="form__section-title"> Switch 2 </div>
+            <div class="form__group">
+                {{form.hostname2}}
+                <label class="form__input__label" for="hostname2"> Hostname </label>
+            </div>
+            <div class="form__group">
+                {{form.protocol2}}
+                <label class="form__choice__label" for="protocol2"> Protocol </label>
+            </div>  
+            <div class="form__group">
+                {{form.ipaddress2}}
+                <label class="form__input__label" for="ipaddress2"> IP Address </label>
+            </div>
+            <div class="form__group">
+                {{form.port2}}
+                <label class="form__input__label" for="port2"> Port Number </label>
+            </div>
+            <div class="form__group">
+                {{form.number2}}
+                <label class="form__choice__label" for="number2"> Switch Number </label>
+            </div>
+            <div class="form__group">
+                {{form.priority2}}
+                <label class="form__choice__label" for="priority2"> Switch Priority </label>
+            </div>      
+        </div>
+
+        <div id="buttons" style="grid-area: buttons">
+            <button data-nextbtn class="button" type="button" style="position:absolute; bottom:0; right:0;"> Next </button>
+        </div>
+    </div>
+
+    <div data-form-step="1" class="main-page__card__form" style="grid-template-rows: 0.1fr auto 0.1fr 2.98fr; grid-template-areas: 'title title' 'cred1 cred2' 'checkbox checkbox' 'buttons buttons';">
         <div class="main-page__card__form__title" style="grid-area:title;">Credentials</div>
         <div id="credentials1" style="grid-area:cred1;">
             <div class="form__section-title" id="cred1_label" style="visibility:hidden;"> Credentials 1 </div>
@@ -41,75 +109,11 @@
                 <label class="form__input__label" for="enablepassword2"> Enable Password </label>
             </div>
         </div>
-
         <div id="cred2checkbox" style="grid-area:checkbox;">
             <div class="form__group" style="height:3rem;">
                 <input type="checkbox" id="cred2checkbox" name="cred2checkbox" style="margin-left:3rem;">
                 <label for="cred2checkbox" style="font-size:.9rem; color:#545454">Use separate credentials</label>
             </div>   
-        </div>
-
-        <div id="buttons" style="grid-area: buttons">
-            <button data-nextbtn class="button" type="button" style="position:absolute; bottom:0; right:0;"> Next </button>
-        </div>
-    </div>
-
-    <div data-form-step="1" class="main-page__card__form" style="grid-template-rows: 0.1fr auto 1fr; grid-template-areas: 'title title' 'switch1 switch2' 'buttons buttons';">
-        <div class="main-page__card__form__title" style="grid-area:title; margin-bottom:1rem;"> Devices </div>
-        <div id="switch1" style="grid-area:switch1;">
-            <div class="form__section-title"> Switch 1 </div>
-            <div class="form__group">
-                {{form.hostname1}}
-                <label class="form__input__label" for="hostname1"> Hostname </label>
-            </div>
-            <div class="form__group">
-                {{form.protocol1}}
-                <label class="form__choice__label" for="protocol1"> Protocol </label>
-            </div>    
-            <div class="form__group">
-                {{form.ipaddress1}}
-                <label class="form__input__label" for="ipaddress1"> IP Address </label>
-            </div>
-            <div class="form__group">
-                {{form.port1}}
-                <label class="form__input__label" for="port1"> Port Number </label>
-            </div>
-            <div class="form__group">
-                {{form.number1}}
-                <label class="form__choice__label" for="number1"> Switch Number </label>
-            </div>
-            <div class="form__group">
-                {{form.priority1}}
-                <label class="form__choice__label" for="priority1"> Switch Priority </label>
-            </div>
-        </div>
-
-        <div id="switch2" style= "grid-area:switch2;">
-            <div class="form__section-title"> Switch 2 </div>
-            <div class="form__group">
-                {{form.hostname2}}
-                <label class="form__input__label" for="hostname2"> Hostname </label>
-            </div>
-            <div class="form__group">
-                {{form.protocol2}}
-                <label class="form__choice__label" for="protocol2"> Protocol </label>
-            </div>  
-            <div class="form__group">
-                {{form.ipaddress2}}
-                <label class="form__input__label" for="ipaddress2"> IP Address </label>
-            </div>
-            <div class="form__group">
-                {{form.port2}}
-                <label class="form__input__label" for="port2"> Port Number </label>
-            </div>
-            <div class="form__group">
-                {{form.number2}}
-                <label class="form__choice__label" for="number2"> Switch Number </label>
-            </div>
-            <div class="form__group">
-                {{form.priority2}}
-                <label class="form__choice__label" for="priority2"> Switch Priority </label>
-            </div>      
         </div>
 
         <div id="buttons" style="grid-area: buttons">

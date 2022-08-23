@@ -5,7 +5,7 @@ testbed:
     password_prompt: 'Password:'
     username: sampleuser
   passwords:
-    tacacs: Sample#1223
+    tacacs: Sample#123
     enable: Cisco#123
     line: Cisco#123
   custom:
@@ -23,7 +23,7 @@ devices:
     custom:
       switchnumber: '1'
       switchpriority: '15'
-    alias: switch1
+    alias: host1
     tacacs: '%{testbed.tacacs}'
     passwords: '%{testbed.passwords}'
     connections:
@@ -41,7 +41,7 @@ devices:
     custom:
       switchnumber: '2'
       switchpriority: '10'
-    alias: switch2
+    alias: host2
     tacacs: '%{testbed.tacacs}'
     passwords: '%{testbed.passwords}'
     connections:
@@ -57,20 +57,20 @@ topology:
       TwentyFiveGigE1/1/0/48:
         link: DAD-LINK-1
         type: ethernet
-      TwentyFiveGigE1/1/0/25:
+      TwentyFiveGigE1/1/0/31:
         link: STACKWISEVIRTUAL-LINK-1
         type: ethernet
-      TwentyFiveGigE1/1/0/31:
+      TwentyFiveGigE1/1/0/41:
         link: STACKWISEVIRTUAL-LINK-2
         type: ethernet
   SWITCH-2:
     interfaces:
-      FortyGigE2/1/0/48:
+      TwentyFiveGigE2/1/0/48:
         link: DAD-LINK-1
         type: ethernet
-      FortyGigE2/1/0/25:
+      TwentyFiveGigE2/1/0/31:
         link: STACKWISEVIRTUAL-LINK-1
         type: ethernet
-      FortyGigE2/1/0/31:
+      TwentyFiveGigE2/1/0/41:
         link: STACKWISEVIRTUAL-LINK-2
         type: ethernet

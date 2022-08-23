@@ -392,7 +392,6 @@ class StackWiseVirtual(object):
                         self.testbed.devices[stackpair["switch1"]].disconnect()
                         self.testbed.devices[stackpair["switch2"]].disconnect()
                         uni_connect(stackpair['stackwiseVirtualDev'])
-                        #.connect()
                         return True
                     else:
                         Logger.info("The Switch does not have in Stackwise Virtual link. Treat it as 2 single nodes")

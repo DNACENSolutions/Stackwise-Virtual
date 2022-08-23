@@ -44,6 +44,7 @@ def form_view(request):
         if formset.is_valid():
             with open(base_dir / "testbed" / "9600_sv_tb.yaml") as f:
                 testbed = yaml.safe_load(f)
+                testbed["testbed"]["custom"]["switchstackinggroups"][0]["platformType"] = form.cleaned_data["platform"]
                 testbed["testbed"]["tacacs"]["username"] = form.cleaned_data["username"]
                 testbed["testbed"]["passwords"]["tacacs"] = form.cleaned_data["password"]
                 testbed["testbed"]["passwords"]["enable"] = form.cleaned_data["enablepassword"]
@@ -89,8 +90,6 @@ def form_view(request):
                     interfaceprefix2 = forms.cleaned_data["interfaceprefix2"]
                     interface1 = forms.cleaned_data["interfacechoice"] + interfaceprefix1 + forms.cleaned_data["interface1"]
                     interface2 = forms.cleaned_data["interfacechoice1"] + interfaceprefix2 + forms.cleaned_data["interface2"]
-                    print(interface1)
-                    print(interface2)
                     if (forms.cleaned_data["linktype"] == 'SVL'):
                         interfaces1[interface1] = {'link': f"STACKWISEVIRTUAL-LINK-{sv_links}", 'type': 'ethernet'}
                         interfaces2[interface2] = {'link': f"STACKWISEVIRTUAL-LINK-{sv_links}", 'type': 'ethernet'}
@@ -101,8 +100,6 @@ def form_view(request):
                         dad_links += 1
                     else:
                         print("Invalid link type")
-                print(interfaces1)
-                print(interfaces2)
                 testbed["topology"]["SWITCH-1"]["interfaces"].clear()
                 testbed["topology"]["SWITCH-1"]["interfaces"].update(interfaces1)
                 testbed["topology"]["SWITCH-2"]["interfaces"].clear()

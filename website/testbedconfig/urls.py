@@ -9,4 +9,5 @@ urlpatterns = [
     path('run-task', views.run_task, name="run-task"),
     path('get-status/<task_id>/', views.get_status, name="get-status"),
     path('show-file', views.show_file, name="show-file"),
+    path('execution-status', views.show_file, name="execution-status"),
 ]

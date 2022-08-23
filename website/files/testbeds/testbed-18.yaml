@@ -3,11 +3,11 @@ testbed:
   tacacs:
     login_prompt: 'Username:'
     password_prompt: 'Password:'
-    username: sampleuser
+    username: sam
   passwords:
-    tacacs: Sample#1223
-    enable: Cisco#123
-    line: Cisco#123
+    tacacs: sam
+    enable: sam
+    line: sam
   custom:
     switchstackinggroups:
     - numberofswitches: 2
@@ -23,14 +23,14 @@ devices:
     custom:
       switchnumber: '1'
       switchpriority: '15'
-    alias: switch1
+    alias: H11
     tacacs: '%{testbed.tacacs}'
     passwords: '%{testbed.passwords}'
     connections:
       defaults:
         class: unicon.Unicon
       a:
-        protocol: ssh
+        protocol: telnet
         ip: 10.195.243.101
         port: 22
         arguments:
@@ -41,12 +41,12 @@ devices:
     custom:
       switchnumber: '2'
       switchpriority: '10'
-    alias: switch2
+    alias: h21
     tacacs: '%{testbed.tacacs}'
     passwords: '%{testbed.passwords}'
     connections:
       a:
-        protocol: ssh
+        protocol: telnet
         ip: 10.195.243.102
         port: 22
         arguments:
@@ -54,23 +54,11 @@ devices:
 topology:
   SWITCH-1:
     interfaces:
-      TwentyFiveGigE1/1/0/48:
+      TwentyFiveGigE1/1/0/1:
         link: DAD-LINK-1
-        type: ethernet
-      TwentyFiveGigE1/1/0/25:
-        link: STACKWISEVIRTUAL-LINK-1
-        type: ethernet
-      TwentyFiveGigE1/1/0/31:
-        link: STACKWISEVIRTUAL-LINK-2
         type: ethernet
   SWITCH-2:
     interfaces:
-      FortyGigE2/1/0/48:
+      TwentyFiveGigE2/1/0/1:
         link: DAD-LINK-1
-        type: ethernet
-      FortyGigE2/1/0/25:
-        link: STACKWISEVIRTUAL-LINK-1
-        type: ethernet
-      FortyGigE2/1/0/31:
-        link: STACKWISEVIRTUAL-LINK-2
         type: ethernet
