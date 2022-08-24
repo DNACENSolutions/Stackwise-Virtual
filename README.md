@@ -118,13 +118,51 @@ Switch   Dad port       Status
 ```
 
 Steps to run job from docker image:
-1.  Go to the below link and download the docker image.
-      https://hub.docker.com/repository/docker/maranjega/docker_images
-2.  Find "Installing Docker Engine in CENTOS 7" from the below link for installing docker engine.
+
+1.  Find "Installing Docker Engine in CENTOS 7/Ubuntoo/RHEL" from the below link for installing docker engine.
       https://docs.docker.com/engine/install/centos/   
 3. Once installed the docker engine,run the below command from your linux machine.
-    " docker run --rm maranjega/docker_images:solution-eng-stackwise-jun15 pyats run job /pyats/sol_eng_stackwise_virtual/job/svl_update_job.py --testbed-file /pyats/sol_eng_stackwise_virtual/testbed/9500_sv_tb.yaml "
-    
+
+   3.1  Go to the below link and download the latest docker image. (Latest Docker image: https://hub.docker.com/r/maranjega/docker_images/tags)
+   docker pull maranjega/docker_images:solution-eng-stackwise-aug19-djang
+
+   3.2  Run the docker image:
+   docker run -it -d maranjega/docker_images:solution-eng-stackwise-aug19-django
+
+   3.3 run command "docker ps solution-eng-stackwise-aug19-django" and get the dockerid
+   ```bash
+   docker ps | grep stackwise
+   cfe3f1ce3716        maranjega/docker_images:solution-eng-stackwise-aug19-django      "/bin/tini -- /pyats…"   About a minute ago   Up About a minute                       quizzical_chebyshev
+   ```
+   3.4 Attach to docker 
+   docker run -it -e 8000 maranjega/docker_images:solution-eng-stackwise-aug19-django
+
+   3.3  source the python environment
+      source bin/activate
+      cd sol_eng_stackwise_virtual
+
+   3.4 update the interface ip in settings
+      ALLOWED_HOSTS = ['*', "localhost", "127.0.0.1"]
+      Add vm interface ip to the list.
+   
+   3.5 to run UI application start server using
+         ```bash
+            python website/manage.py runserver <ipaddress>:8000
+            sample: python website/manage.py runserver 127.0.0.1:8000
+            (pyatsenv) PAWANSI-M-5DCS:Stackwise-Virtual pawansingh$ python website/manage.py runserver 
+               Watching for file changes with StatReloader
+               Performing system checks...
+
+               System check identified no issues (0 silenced).
+               August 24, 2022 - 05:26:35
+               Django version 3.2.15, using settings 'website.settings'
+               Starting development server at http://127.0.0.1:8000/
+               Quit the server with CONTROL-C.
+         ```
+   3.6 Open a browser and use url: http://127.0.0.1:8000/ to generate testbed file.
+   3.7 Once the testbed file is saved.  from the docker run script to configure stackwise virtual.
+   ./stackwisevirtual.sh -c ./testbed/generated_testbed_file.yaml
+
 STEPS to add new testbed file to existing docker image and run :
 
 1. Mount the local testbed directory in docker with the below command 
