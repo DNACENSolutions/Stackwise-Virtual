@@ -106,7 +106,6 @@ def form_view(request):
                 testbed["topology"]["SWITCH-2"]["interfaces"].update(interfaces2)
                 pprint.pprint(testbed)
                 request.session['current-testbed'] = testbed
-
             with open(base_dir / "website" / "files" / "testbed_preview" / "preview.txt", "w") as g:
                 yaml.dump(testbed, g, sort_keys=False, default_flow_style=False)
             with open (base_dir / "testbed/generated_testbed_file.yaml", "w") as h:
