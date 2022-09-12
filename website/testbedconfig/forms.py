@@ -28,26 +28,20 @@ class ConfigForm(forms.Form):
                                validators=[validators.MaxLengthValidator(32),validators.MinLengthValidator(3)])
     password2 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'password2', 'autocomplete': 'off'}),
                                validators=[validators.MaxLengthValidator(32),validators.MinLengthValidator(3)])
-    enablepassword2 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'enablepassword2', 'autocomplete': 'off'}),
-                               validators=[validators.MaxLengthValidator(32),validators.MinLengthValidator(3)])
+    enablepassword2 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'enablepassword2', 'autocomplete': 'off'}),validators=[validators.MaxLengthValidator(32),validators.MinLengthValidator(3)])
 
     # separate switch forms
-    hostname1 = forms.CharField(initial="svlswitch1",widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'hostname1', 'autocomplete': 'off'}))
-                               #validators=[validators.MaxLengthValidator(32),validators.MinLengthValidator(1)],required=True)
+    hostname1 = forms.CharField(initial="svlswitch1",widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'hostname1', 'autocomplete': 'off'}),validators=[validators.MaxLengthValidator(32),validators.MinLengthValidator(1)],required=True)
     number1 = forms.ChoiceField(choices=num_choices, initial=1, widget=forms.Select(attrs={'placeholder': ' ','class': 'form__choice', 'id': 'number1'}))
     priority1 = forms.ChoiceField(choices=priority_choices, initial=15, widget=forms.Select(attrs={'placeholder': ' ','class': 'form__choice', 'id': 'priority1'}))
-    ipaddress1 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'ipaddress1', 'autocomplete': 'off'}))
-                                 #validators=[validators.validate_ipv46_address],required=True)
+    ipaddress1 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'ipaddress1', 'autocomplete': 'off'}),validators=[validators.validate_ipv46_address],required=True)
     port1 = forms.IntegerField(initial=22, widget=forms.NumberInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'port1', 'autocomplete': 'off'}))
-    protocol1 = forms.ChoiceField(choices=protocol_choices, initial="ssh", widget=forms.Select(attrs={'placeholder': ' ','class': 'form__choice', 'id': 'protocol1'}),
-                                  required=True)
+    protocol1 = forms.ChoiceField(choices=protocol_choices, initial="ssh", widget=forms.Select(attrs={'placeholder': ' ','class': 'form__choice', 'id': 'protocol1'}),required=True)
 
-    hostname2 = forms.CharField(initial="svlswitch2",widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'hostname2', 'autocomplete': 'off'}))
-                               #validators=[validators.MaxLengthValidator(32),validators.MinLengthValidator(1)],required=True)
+    hostname2 = forms.CharField(initial="svlswitch2",widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'hostname2', 'autocomplete': 'off'}),validators=[validators.MaxLengthValidator(32),validators.MinLengthValidator(1)],required=True)
     number2 = forms.ChoiceField(choices=num_choices, initial= 2, widget=forms.Select(attrs={'placeholder': ' ','class': 'form__choice', 'id': 'number2'}))
     priority2 = forms.ChoiceField(choices=priority_choices, initial=10, widget=forms.Select(attrs={'placeholder': ' ','class': 'form__choice', 'id': 'priority2'}))
-    ipaddress2 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'ipaddress2', 'autocomplete': 'off'}))
-                                 #validators=[validators.validate_ipv46_address],required=True)
+    ipaddress2 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'ipaddress2', 'autocomplete': 'off'}),validators=[validators.validate_ipv46_address],required=True)
     port2 = forms.IntegerField(initial=22, widget=forms.NumberInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'port2', 'autocomplete': 'off'}))
     protocol2 = forms.ChoiceField(choices=protocol_choices, initial="ssh", widget=forms.Select(attrs={'placeholder': ' ','class': 'form__choice', 'id': 'protocol2'}))
 class LinksConfigForm(forms.Form):
@@ -67,8 +61,8 @@ class LinksConfigForm(forms.Form):
     ]
     linktype = forms.ChoiceField(choices=linktype_choices, widget=forms.Select(attrs={'placeholder': ' ', 'class': 'form__choice', 'id': 'linktype', 'style': 'width:5rem; margin:0;'}))
     interfacechoice = forms.ChoiceField(choices=interface_choices, widget=forms.Select(attrs={'placeholder': ' ', 'class': 'form__choice', 'id': 'interfacechoice', 'style': 'width:9.3rem; margin:0;'}))
-    interfacechoice1 = forms.ChoiceField(choices=interface_choices, widget=forms.Select(attrs={'placeholder': ' ', 'class': 'form__choice', 'id': 'interfacechoice1', 'style': 'width:9.3rem; margin:0;'}))
     interfaceprefix1 = forms.ChoiceField(choices=prefix_choices, widget=forms.Select(attrs={'placeholder': ' ', 'class': 'form__choice', 'id': 'interfaceprefix1', 'style': 'width:3rem; margin:0;'}))
     interfaceprefix2 = forms.ChoiceField(choices=prefix_choices, initial='2/', widget=forms.Select(attrs={'placeholder': ' ', 'class': 'form__choice', 'id': 'interfaceprefix2', 'style': 'width:3rem; margin:0;'}))
     interface1 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'interface1', 'autocomplete': 'on', 'style': 'width:4rem; margin:0;'}))
     interface2 = forms.CharField(widget=forms.TextInput(attrs={'placeholder': ' ', 'class': 'form__input', 'id': 'interface2', 'autocomplete': 'on', 'style': 'width:4rem; margin:0;'}))
+

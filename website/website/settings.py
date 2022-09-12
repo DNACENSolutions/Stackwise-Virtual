@@ -134,4 +134,6 @@ MEDIA_ROOT = BASE_DIR / "files"
 MEDIA_URL = "/files/"
 
 CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_IGNORE_RESULT = False
+CELERY_TASK_TRACK_STARTED = True
