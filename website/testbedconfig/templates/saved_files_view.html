@@ -98,11 +98,10 @@
                 <td>${res.task_date}</td>
                 <td><button type="button" class="table-button" data-file="${res.file}">${res.task_result}</button></td>
             </tr>`
-            //$('#tasks').prepend(html)
-            $('#tasks').replaceWith(html)
+            $('#tasks').prepend(html)
             const taskStatus = res.task_status;
 
-            if (taskStatus === 'SUCCESS' || taskStatus === 'FAILURE') return false;
+            if (taskStatus ==='SUCCESS' || taskStatu ==='FAILURE') return false;
             setTimeout(function() {
             getStatus(res.task_id);
             }, 10000);

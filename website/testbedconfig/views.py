@@ -112,8 +112,10 @@ def form_view(request):
                 yaml.dump(testbed, h, sort_keys=False, default_flow_style=False)
             return redirect("testbed-preview")
         else:
+            print(formset.errors)
             print("Formset are invalid")
     else:
+        print(form.errors)
         print("Forms are invalid")
     context = {'form': form, 'formset': formset}
     return render(request, 'form_view.html', context)
@@ -134,7 +136,11 @@ def run_task(request):
         if request.POST.get('job') == 'create':
             id = f"SVLTask-{request.POST.get('job')}-{request.POST.get('file').replace('.yaml', '')}"
             print(request.POST.get('file'))
-            task = create_SWV.apply_async(args=[request.POST.get('file'), id], task_id=id)
+            now = datetime.now()
+            ct = now.strftime("%d%m%Y_%H%M%S")
+            id = id+ct
+            print(id)
+            task = create_SWV.apply_async(args=((request.POST.get('file')),id,),task_id = id)
             return JsonResponse({'task_id': task.id}, status=200)
 
 @csrf_exempt
@@ -162,3 +168,4 @@ def show_file(request, file):
     yaml.dump(request.session["current-testbed"], f, sort_keys=False, default_flow_style=False)
     response = FileResponse(file_show)
     return response
+
