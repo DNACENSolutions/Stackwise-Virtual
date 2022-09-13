@@ -14,7 +14,38 @@ def create_SWV(file, id):
     logger.info(base_dir)
     os.chdir(base_dir / "/pyats/sol_eng_stackwise_virtual")
     logger.info(os.getcwd())
-    process = Popen(["pyats","run","job","job/svl_job.py","--testbed",("website/files/testbeds/"+file)],stdout=subprocess.PIPE)
+    process = Popen(["pyats","run","job","job/svl_job.py","--testbed",
+                     ("website/files/testbeds/"+file)],stdout=subprocess.PIPE)
+    id = id +".txt"
+    output = process.stdout.read()
+    logger.info(output)
+    file = open(id, 'w')
+    file.write(output.decode("utf-8"))
+    return True
+
+@shared_task
+def delete_SWV(file, id):
+    base_dir = Path(__file__).resolve().parent.parent.parent.parent
+    logger.info(base_dir)
+    os.chdir(base_dir / "/pyats/sol_eng_stackwise_virtual")
+    logger.info(os.getcwd())
+    process = Popen(["pyats","run","job","job/svl_remove_job.py","--testbed",
+                     ("website/files/testbeds/"+file)],stdout=subprocess.PIPE)
+    id = id +".txt"
+    output = process.stdout.read()
+    logger.info(output)
+    file = open(id, 'w')
+    file.write(output.decode("utf-8"))
+    return True
+
+@shared_task
+def update_SWV(file, id):
+    base_dir = Path(__file__).resolve().parent.parent.parent.parent
+    logger.info(base_dir)
+    os.chdir(base_dir / "/pyats/sol_eng_stackwise_virtual")
+    logger.info(os.getcwd())
+    process = Popen(["pyats","run","job","job/svl_update_job.py","--testbed",
+                     ("website/files/testbeds/"+file)],stdout=subprocess.PIPE)
     id = id +".txt"
     output = process.stdout.read()
     logger.info(output)

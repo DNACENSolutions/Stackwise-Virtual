@@ -7,6 +7,9 @@ urlpatterns = [
     path('testbed-file', views.testbed_file, name="testbed-file"),
     path('', views.form_view, name="testbed-config"),
     path('run-task', views.run_task, name="run-task"),
+    #path('delete-task', views.run_delete_task, name="delete-task"),
+    #path('update-task', views.run_update_task, name="update-task"),
     path('get-status/<task_id>/', views.get_status, name="get-status"),
+    #path('show-tasks', views.show_tasks, name="show_tasks"),
     path('show-file', views.show_file, name="show-file")
 ]

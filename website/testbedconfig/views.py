@@ -8,10 +8,11 @@ from pathlib import Path
 import yaml
 from .models import TestbedFiles
 from celery.result import AsyncResult
-from .tasks import create_SWV
+from .tasks import create_SWV, delete_SWV, update_SWV
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 import pprint
+tasks_list = []
 def testbed_yaml_preview(request):
     base_dir = Path(__file__).resolve().parent.parent
     if 'savebtn' in request.POST:
@@ -57,30 +58,25 @@ def form_view(request):
                                     "password_prompt": "Password:"
                                 }, 
                             "passwords2": {}}
-
                     cred2_dict["tacacs2"]["username"] = form.cleaned_data["username2"]
                     cred2_dict["passwords2"]["tacacs"] = form.cleaned_data["password2"]
                     cred2_dict["passwords2"]["enable"] = form.cleaned_data["enablepassword2"]
                     cred2_dict["passwords2"]["line"] = form.cleaned_data["enablepassword2"]
-
                     testbed["testbed"].update(cred2_dict)
                     testbed["devices"]["SWITCH-2"]["tacacs"] = "%{testbed.tacacs2}"
                     testbed["devices"]["SWITCH-2"]["passwords"] = "%{testbed.passwords2}"
-
                 testbed["devices"]["SWITCH-1"]["alias"] = form.cleaned_data["hostname1"]
                 testbed["devices"]["SWITCH-1"]["custom"]["switchnumber"] = form.cleaned_data["number1"]
                 testbed["devices"]["SWITCH-1"]["custom"]["switchpriority"] = form.cleaned_data["priority1"]
                 testbed["devices"]["SWITCH-1"]["connections"]["a"]["protocol"] = form.cleaned_data["protocol1"]
                 testbed["devices"]["SWITCH-1"]["connections"]["a"]["ip"] = form.cleaned_data["ipaddress1"]
                 testbed["devices"]["SWITCH-1"]["connections"]["a"]["port"] = form.cleaned_data["port1"]
-
                 testbed["devices"]["SWITCH-2"]["alias"] = form.cleaned_data["hostname2"]
                 testbed["devices"]["SWITCH-2"]["custom"]["switchnumber"] = form.cleaned_data["number2"]
                 testbed["devices"]["SWITCH-2"]["custom"]["switchpriority"] = form.cleaned_data["priority2"]
                 testbed["devices"]["SWITCH-2"]["connections"]["a"]["protocol"] = form.cleaned_data["protocol2"]
                 testbed["devices"]["SWITCH-2"]["connections"]["a"]["ip"] = form.cleaned_data["ipaddress2"] 
                 testbed["devices"]["SWITCH-2"]["connections"]["a"]["port"] = form.cleaned_data["port2"]
-
                 interfaces1 = {}
                 interfaces2 = {}
                 sv_links = 1
@@ -133,6 +129,7 @@ def saved_files_view(request):
 @csrf_exempt
 def run_task(request):
     if request.POST:
+        print(request.POST.get('job'))
         if request.POST.get('job') == 'create':
             id = f"SVLTask-{request.POST.get('job')}-{request.POST.get('file').replace('.yaml', '')}"
             print(request.POST.get('file'))
@@ -141,8 +138,32 @@ def run_task(request):
             id = id+ct
             print(id)
             task = create_SWV.apply_async(args=((request.POST.get('file')),id,),task_id = id)
+            tasks_list.append(task.id)
             return JsonResponse({'task_id': task.id}, status=200)
-
+        elif request.POST.get('job') == 'delete':
+            id = f"SVLTask-{request.POST.get('job')}-{request.POST.get('file').replace('.yaml', '')}"
+            print(request.POST.get('file'))
+            now = datetime.now()
+            ct = now.strftime("%d%m%Y_%H%M%S")
+            id = id+ct
+            print(id)
+            task = delete_SWV.apply_async(args=((request.POST.get('file')),id,),task_id = id)
+            tasks_list.append(task.id)
+            return JsonResponse({'task_id': task.id}, status=200)
+        elif request.POST.get('job') == 'update':
+            id = f"SVLTask-{request.POST.get('job')}-{request.POST.get('file').replace('.yaml', '')}"
+            print(request.POST.get('file'))
+            now = datetime.now()
+            ct = now.strftime("%d%m%Y_%H%M%S")
+            id = id+ct
+            print(id)
+            task = update_SWV.apply_async(args=((request.POST.get('file')),id,),task_id = id)
+            tasks_list.append(task.id)
+            return JsonResponse({'task_id': task.id}, status=200)
+        else:
+            print(tasks_list)
+            return JsonResponse({'task_id': []}, status=200)
+        
 @csrf_exempt
 def get_status(request, task_id):
     task_result = AsyncResult(task_id)
@@ -159,7 +180,6 @@ def get_status(request, task_id):
         "task_date": task_date,
         "task_result": task_id + '.txt',
     }
-
     return JsonResponse(result, status=200)
 
 @csrf_exempt

@@ -15,7 +15,7 @@
                         <button id="create-{{file}}" class="button" type="button" data-file="{{file}}" data-name="create" style="display:block; width:15rem; margin: 0.2rem;">Create StackWise-Virtual</button>
                         <button id="delete-{{file}}" class="button" type="button" data-file="{{file}}" data-name="delete" style="display:block; width:15rem; margin: 0.2rem;">Delete StackWise-Virtual</button>
                         <button id="update-{{file}}" class="button" type="button" data-file="{{file}}" data-name="update" style="display:block; width:15rem; margin: 0.2rem;">Update StackWise-Virtual</button>
-                        <button id="show-{{file}}" class="button" type="button" data-file="{{file}}" data-name="show" style="display:block; width:15rem; margin: 0.2rem;">Show File</button>
+                        <button id="show-{{file}}" class="button" type="button" data-file="{{file}}" data-name="show" style="display:block; width:15rem; margin: 0.2rem;">Show tasks</button>
                     </div>                       
                 {% endfor %}
                 <input id="file-form" value=" " name="file" style="display: none"/>
@@ -121,7 +121,7 @@
             running.setAttribute('class', 'page-content')
             saved.setAttribute('class', 'no-display')
             switchbtn.style.width = '9rem'
-            switchbtn.innerText = 'View Saved Files'
+            switchbtn.innerText = 'Refresh Tasks'
         }
         else if (running.className == 'page-content') {
             running.setAttribute('class', 'no-display')
