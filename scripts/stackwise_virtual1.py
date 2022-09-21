@@ -117,16 +117,27 @@ class svlformation_and_validation(aetest.Testcase):
                 if not svl_handle.configure_svl_step1(stackpair):
                     result=False
                     step.failed("Step1 Configure the step 1 config, switch number and domain configs on switches, failed")
+
+                if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
+                    result=False
+                    step.failed("Step2 Save config and reload the switches, failed")
+
                 if not svl_handle.configure_svl_step2_svllinkconfig(stackpair):
                     result=False
                     step.failed("Step3 Config stackwise Virtual links on switches, failed.")
+
+                if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
+                    result=False
+                    step.failed("Step4 Save config and reload the switches, failed.")
+
                 if not svl_handle.connect_to_stackpair(stackpair):
                     result=False
                     step.failed("Could not connect to devices, Can not proceed. for stackwise virtual pair :{}".format(stackpair))
+
                 if not svl_handle.configure_svl_step3_dad_linkconfig(stackpair):
                     result=False
                     step.failed("Step5 Configuring stackwise Virtual Dual Active Detection Links, failed.")
-                svl_handle.configure_updated_config_in_the_switches(stackpair)
+
                 if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
                     result=False
                     step.failed("Step6 Save config and reload the switches, failed.")
@@ -134,23 +145,7 @@ class svlformation_and_validation(aetest.Testcase):
             self.failed("Stackwise Virtual configuration failed on one or more switches. ")
         else:
             self.passed("Stackwise Virtual configurations are success.")
-    @aetest.test
-    def update_interface_config_after_svl_formation(self,svl_handle):
-        '''
-            This is a post check to update the interface config on the switches after SVL formation.
-        '''
-        steps = Steps()
-        result=True
-        for stackpair in svl_handle.device_pair_list:
-            with steps.start("Update interface config after SVL formation",continue_= True) as step:
-                if not svl_handle.update_interface_config_after_svl_formation(stackpair):
-                    result=False
-                    step.failed("Update interface config after SVL formation failed for stackwise virtual pair :{}".format(stackpair))
-        if not result:
-            self.failed("Update interface config after SVL formation failed on some or all of the Stackwise Virtual Pairs")
-        else:
-            self.passed("Update interface config after SVL formation passed on all Stackwise Virtual Pairs")
-            
+
     @aetest.test
     def test_validate_configs_for_stackwise_virtual_pair(self,svl_handle):
         '''
@@ -178,7 +173,7 @@ class svlformation_and_validation(aetest.Testcase):
                 self.failed("Stackwise Virtual dual active link status check failed: {}".format(stackpair))
             else:
                 Logger.info("Stackwise Virtual dual active link status is success for stackpair: {}".format(stackpair))
-
+    
 class common_cleanup(aetest.CommonCleanup):
     @aetest.subsection
     def disconnect_from_devices(self, svl_handle):

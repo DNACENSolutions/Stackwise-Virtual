@@ -1,14 +1,15 @@
 #Stackwise vitual Class. Models two switches as one HA device.
+from distutils.errors import LinkError
 from threading import Thread
 from pyats.topology import loader
 import logging
 import re
 import time
+from copy import deepcopy
 from unicon.eal.dialogs import Statement, Dialog
 from pyats.topology import Device
 import traceback
 from unicon.utils import Utils as unicon_utils
-
 #=================================Global Constants=====
 SVLVERSION_9500="16.8.1"
 SVLVERSION_9400="16.9.1"
@@ -200,13 +201,13 @@ class StackWiseVirtual(object):
                     dev_stack["switch{}".format(count)] = switch
                     count=count+1
                     dev_stack['pairinfo'] = pair
+                print(dev_stack)
                 if int(self.testbed.devices[dev_stack["switch1"]].custom.switchnumber) == 1:
                     switch1 = "switch1"
                     switch2 = "switch2"
                 else:
                     switch1 = "switch2"
                     switch2 = "switch1"
-                
                 dev_stack['stackwiseVirtualDev'] =  Device(name=self.testbed.devices[dev_stack[switch1]].name+"svl",
                             type=self.testbed.devices[dev_stack[switch1]].type,
                             os=self.testbed.devices[dev_stack[switch1]].os,
@@ -215,7 +216,8 @@ class StackWiseVirtual(object):
                             credentials=self.testbed.devices[dev_stack[switch1]].credentials,
                             tacacs=self.testbed.devices[dev_stack[switch1]].tacacs,
                             custom=self.testbed.devices[dev_stack[switch1]].custom,
-                            connections=self.testbed.devices[dev_stack[switch1]].connections)
+                            connections=deepcopy(self.testbed.devices[dev_stack[switch1]].connections))
+                print(dev_stack)
                 for key in list(self.testbed.devices[dev_stack[switch2]].connections.keys()):
                     if key in SKIPCONLIST:
                         continue
@@ -224,11 +226,10 @@ class StackWiseVirtual(object):
                             if k in list(self.testbed.devices[dev_stack[switch1]].connections.keys()):
                                 continue
                             else:
-                                print(self.testbed.devices[dev_stack[switch2]].connections[key])
                                 if self.testbed.devices[dev_stack[switch2]].connections[key]["protocol"] == "ssh":
                                     continue
                                 else:
-                                    self.testbed.devices[dev_stack[switch1]].connections[key] = self.testbed.devices[dev_stack[switch2]].connections[key]
+                                    dev_stack['stackwiseVirtualDev'].connections[k] = self.testbed.devices[dev_stack[switch2]].connections[key]
                                     break
 
                 Logger.info(dev_stack['stackwiseVirtualDev'].connections)
@@ -270,7 +271,6 @@ class StackWiseVirtual(object):
                                 if k in list(self.testbed.devices[dev_stack[switch1]].connections.keys()):
                                     continue
                                 else:
-                                    print(self.testbed.devices[dev_stack[switch2]].connections[key])
                                     if self.testbed.devices[dev_stack[switch2]].connections[key]["protocol"] == "ssh":
                                         continue
                                     else:
@@ -281,7 +281,9 @@ class StackWiseVirtual(object):
                     dev_stack["status"] = False
                     self.device_pair_list.append(dev_stack)
                     break
-
+        print(self.testbed.devices[dev_stack[switch1]].connections)
+        print(self.testbed.devices[dev_stack[switch2]].connections)
+        return True
     def get_device_version(self, dev):
         '''
             USAGES: This function 
@@ -294,6 +296,51 @@ class StackWiseVirtual(object):
         model_number = re.findall("Model Number\s+:\s+(\S+)",str(output))[0]
         return dict(version=version,model=model_number)
 
+    def get_device_config_before_svl(self, dev):
+        ''' Get the switch Interface configs config before performing SVL'''
+        output=self.testbed.devices[dev].execute("show running-config | sec interface")
+        self.testbed.devices[dev].config_before_svl = output
+        return output
+    
+    def update_device_config_with_new_link_numbers(self, stackpair):
+        ''' Get the switch Interface configs config before performing SVL'''
+        self.get_device_config_before_svl(stackpair["switch1"])
+        self.get_device_config_before_svl(stackpair["switch2"])
+        self.testbed.devices[stackpair["switch1"]].dev_updated_config = \
+                                        collect_isis_configured_interface_configs( 
+                                            self.testbed.devices[stackpair["switch1"]].config_before_svl, 1,
+                                            stackpair['pairinfo']["platformType"])
+        self.testbed.devices[stackpair["switch2"]].dev_updated_config  = \
+                                        collect_isis_configured_interface_configs( 
+                                            self.testbed.devices[stackpair["switch2"]].config_before_svl, 2,
+                                            stackpair['pairinfo']["platformType"])
+        print(self.generate_eem_configs_from_old_interface_configs(stackpair))
+        return True
+    def generate_eem_configs_from_old_interface_configs(self, stackpair):
+        ''' Generate EEM configs from old interface configs'''
+        eem_config = \
+            """event manager applet STACKMGR_FORMATION authorization bypass
+                event syslog pattern \"DMI-5-SYNC_COMPLETE: Chassis 2 R0/0\"
+                action 1.0 syslog msg \"Updating interace configs for SVL with new link numbers\"
+                action 2.0 cli command \"configure terminal\"
+            """
+        counter =3
+        for line in self.testbed.devices[stackpair["switch1"]].dev_updated_config.split('\n'):
+            eem_config += f"action {counter}.0 cli command \"{line}\"\n"
+            counter +=1
+        for line in self.testbed.devices[stackpair["switch2"]].dev_updated_config.split('\n'):
+            eem_config += f"action {counter}.0 cli command \"{line}\"\n"
+            counter +=1
+        self.testbed.devices[stackpair["switch1"]].eem_config = eem_config
+        self.testbed.devices[stackpair["switch2"]].eem_config = eem_config
+        return eem_config
+    
+    def configure_updated_config_in_the_switches(self, stackpair):
+        ''' Get the switch Interface configs config before performing SVL'''
+        self.testbed.devices[stackpair["switch1"]].configure(self.testbed.devices[stackpair["switch1"]].eem_config)
+        self.testbed.devices[stackpair["switch1"]].execute("write memory")
+        self.testbed.devices[stackpair["switch2"]].configure(self.testbed.devices[stackpair["switch1"]].eem_config)
+        self.testbed.devices[stackpair["switch2"]].execute("write memory")
     def check_links(self, stackpair):
         '''
             USAGES: This function 
@@ -373,43 +420,34 @@ class StackWiseVirtual(object):
             Returns: True if success, False if Fails
         '''
         result=True
+        print(self.testbed.devices[stackpair["switch1"]].connections)
+        print(self.testbed.devices[stackpair["switch2"]].connections)
         if stackpair['pairinfo']["platformType"] in SUPPORTED_PLATFORMS_LIST: 
             try:
                 if stackpair['stackwiseVirtualDev'].connected or (self.testbed.devices[stackpair["switch1"]].connected and self.testbed.devices[stackpair["switch2"]].connected):
                     return True
                 else:
                     self.disconnect_from_stackpair(stackpair)
-                if not self.testbed.devices[stackpair["switch1"]].connected:
-                    dev_detail = uni_connect(self.testbed.devices[stackpair["switch1"]])
-                output = self.testbed.devices[stackpair["switch1"]].execute("show stackwise-virtual neighbors")
-                output1 = self.testbed.devices[stackpair["switch1"]].execute("show stackwise-virtual")
-                stackstatus = re.findall('Stackwise Virtual : Enabled',output1)
-                stackpair["status"]=False
-                if stackstatus:
-                    output2 = output.split("\n")
-                    for line in output2:
-                        print(line)
-                        stackstatus1 = re.findall('\d[\s\t]+\d[\s\t]+[\w/]+[\s\t]+[\w/]+',line)
-                        if stackstatus1:
-                            stackpair["status"]=True
-                            break
-                    print(stackpair["status"])
-                    if stackpair["status"]:
-                        print("Setting stackwise virtual to True")
-                        self.testbed.devices[stackpair["switch1"]].disconnect()
-                        self.testbed.devices[stackpair["switch2"]].disconnect()
-                        uni_connect(stackpair['stackwiseVirtualDev'])
-                        return True
-                    else:
-                        Logger.info("The Switch does not have in Stackwise Virtual link. Treat it as 2 single nodes")
+                if not self.testbed.devices[stackpair["switch1"]].is_connected():
+                    uni_connect(self.testbed.devices[stackpair["switch1"]])
+                if self.validate_if_switches_are_in_staclwise_virtual(stackpair["switch1"]):
+                    stackpair["status"] = True
+                    print("Setting stackwise virtual to True")
+                    self.testbed.devices[stackpair["switch1"]].disconnect()
+                    self.testbed.devices[stackpair["switch2"]].disconnect()
+                    uni_connect(stackpair['stackwiseVirtualDev'])
+                    return True
                 else:
                     Logger.info("The Switch is does not in Stackwise Virtual enabled. Treat it as 2 single nodes")
+                    stackpair["status"] = False
                 if not stackpair["status"]:
                     if not self.testbed.devices[stackpair["switch2"]].connected:
-                        dev_detail = self.testbed.devices[stackpair["switch2"]].connect()
+                       self.testbed.devices[stackpair["switch2"]].connect()
                     stackpair["status"] = False
                     return True
             except:
+                print("In Exception")
+                traceback.print_exc()
                 self.testbed.devices[stackpair["switch1"]].disconnect()
                 self.testbed.devices[stackpair["switch2"]].disconnect()
                 stackpair['stackwiseVirtualDev'].disconnect()
@@ -430,11 +468,12 @@ class StackWiseVirtual(object):
                     result=False
         else:
             try:
+                print("In Exception")
                 if not self.testbed.devices[stackpair["switch1"]].connected:
-                    dev_detail = uni_connect(self.testbed.devices[stackpair["switch1"]])
+                    uni_connect(self.testbed.devices[stackpair["switch1"]])
                     #.connect()
                 if not self.testbed.devices[stackpair["switch2"]].connected:
-                    dev_detail = uni_connect(self.testbed.devices[stackpair["switch2"]])
+                    uni_connect(self.testbed.devices[stackpair["switch2"]])
                     #.connect()
             except:
                 Logger.error("Could not connect to the device")
@@ -449,7 +488,32 @@ class StackWiseVirtual(object):
             stackpair['stackwiseVirtualDev'].connected = False
             return self.connect_to_stackpair(stackpair, retry=retry-1)
         return result
-
+    def validate_if_switches_are_in_staclwise_virtual(self,dev,retry=4, sleep=20):
+        ''' Validate SVL status after login to the switch'''
+        output = self.testbed.devices[dev].execute("show run | sec stackwise-virtual")
+        if re.findall("stackwise-virtual", output):
+            Logger.info("Stackwise Virtual configs are present")
+        else:
+            Logger.error(f"Stackwise Virtual configs are not present on the switch: {dev}")
+            return False
+        #Check if stackwise status is up
+        output = self.testbed.devices[dev].execute("show stackwise-virtual neighbors")
+        print(output)
+        output1 = self.testbed.devices[dev].execute("show stackwise-virtual")
+        stackstatus = re.findall('Stackwise Virtual : Enabled',output1)
+        result=False
+        if stackstatus:
+            output2 = output.split("\n")
+            for line in output2:
+                stackstatus1 = re.findall('\d[\s\t]+\d[\s\t]+[\w/]+[\s\t]+[\w/]+',line)
+                if stackstatus1:
+                    result = True
+                    break
+            print(result)
+        if not result and retry > 0:
+            time.sleep(sleep)
+            return self.validate_if_switches_are_in_staclwise_virtual(dev, retry=retry-1)
+        return result
     def connect_to_stackwiseVirtual(self,stackpair):
         '''
             USAGES: This function 
@@ -600,18 +664,20 @@ class StackWiseVirtual(object):
         for link in self.testbed.devices[stackpair["switch1"]]:
             if link.link.name.upper().find('STACKWISEVIRTUAL-LINK') != -1:
                 config1 += """
-                            interface {}
+                            default interface {0}
+                            interface {0}
                                 stackwise-virtual link 1""".format(link.name)
 
         for link in self.testbed.devices[stackpair["switch2"]]:
             if link.link.name.upper().find('STACKWISEVIRTUAL-LINK') != -1:
                 config2 += """
-                            interface {}
+                            default interface {0}
+                            interface {0}
                                 stackwise-virtual link 1""".format(link.name)
         Logger.info(config1)
         Logger.info(config2)
-
-        if stackpair['pairinfo']["platformType"] in SUPPORTED_PLATFORMS_LIST and stackpair["status"]:
+        print(stackpair["status"])
+        if stackpair['pairinfo']["platformType"] in SUPPORTED_PLATFORMS_LIST and stackpair["status"] and stackpair['stackwiseVirtualDev'].is_connected():
             stackpair['stackwiseVirtualDev'].configure(config1)
             stackpair['stackwiseVirtualDev'].configure(config2)
             stackpair['stackwiseVirtualDev'].execute("show stackwise-virtual")
@@ -641,16 +707,21 @@ class StackWiseVirtual(object):
         config2=""
         for link in self.testbed.devices[stackpair["switch1"]]:
             if link.link.name.upper().find('DAD-LINK') != -1:
-                config1 += """interface {}
+                config1 += """
+                            default interface {0}
+                            interface {0}
                                 stackwise-virtual dual-active-detection
                                 """.format(link.name)
 
         for link in self.testbed.devices[stackpair["switch2"]]:
             if link.link.name.upper().find('DAD-LINK') != -1:
-                config2 += """interface {}
+                config2 += """
+                            default interface {0}
+                            interface {0}
                                 stackwise-virtual dual-active-detection
                                 """.format(link.name)
-        if stackpair['pairinfo']["platformType"] in SUPPORTED_PLATFORMS_LIST and stackpair["status"]:
+        print(stackpair["status"])
+        if stackpair['pairinfo']["platformType"] in SUPPORTED_PLATFORMS_LIST and stackpair["status"] and stackpair['stackwiseVirtualDev'].is_connected():
             stackpair['stackwiseVirtualDev'].configure(config1)
             stackpair['stackwiseVirtualDev'].configure(config2)
             stackpair['stackwiseVirtualDev'].execute("show stackwise-virtual")
@@ -732,7 +803,9 @@ class StackWiseVirtual(object):
                 result=False
             for link in self.testbed.devices[stackpair["switch1"]]:
                 if link.link.name.upper().find('STACKWISEVIRTUAL-LINK') != -1:
-                    a=re.findall(link.name, output1)
+                    
+                    updated_link_name = update_link_name(link.name, 1, stackpair['pairinfo']["platformType"])
+                    a=re.findall(updated_link_name, output1)
                     if len(a) >= 2:
                         Logger.info("Link {} from switch {} is available in the links for stackwise Virtual!".format(link.name,stackpair["switch1"]))
                     else:
@@ -740,7 +813,8 @@ class StackWiseVirtual(object):
                         result=False
             for link in self.testbed.devices[stackpair["switch2"]]:
                 if link.link.name.upper().find('STACKWISEVIRTUAL-LINK') != -1:
-                    a=re.findall(link.name, output1)
+                    updated_link_name = update_link_name(link.name, 1, stackpair['pairinfo']["platformType"])
+                    a=re.findall(updated_link_name, output1)
                     if len(a) >= 2:
                         Logger.info("Link {} from switch {} is available in the links for stackwise Virtual!".format(link.name,stackpair["switch2"]))
                     else:
@@ -748,7 +822,8 @@ class StackWiseVirtual(object):
                         result=False
             for link in self.testbed.devices[stackpair["switch1"]]:
                 if link.link.name.upper().find('DAD-LINK') != -1:
-                    a=re.findall("\d+\s+{}\s+up".format(link.name), output2)
+                    updated_link_name = update_link_name(link.name, 1, stackpair['pairinfo']["platformType"])
+                    a=re.findall("\d+\s+{}\s+up".format(updated_link_name), output2)
                     if len(a) >= 1:
                         Logger.info("Link {} from switch {} is available in DAD links!".format(link.name,stackpair["switch1"]))
                     else:
@@ -756,7 +831,8 @@ class StackWiseVirtual(object):
                         result=False
             for link in self.testbed.devices[stackpair["switch2"]]:
                 if link.link.name.upper().find('DAD-LINK') != -1:
-                    a=re.findall("\d+\s+{}\s+up".format(link.name), output2)
+                    updated_link_name = update_link_name(link.name, 1, stackpair['pairinfo']["platformType"])
+                    a=re.findall("\d+\s+{}\s+up".format(updated_link_name), output2)
                     if len(a) >= 1:
                         Logger.info("Link {} from switch {} is available in DAD links!!".format(link.name,stackpair["switch2"]))
                     else:
@@ -810,7 +886,28 @@ class StackWiseVirtual(object):
             time.sleep(30)
             return self.validate_stackwise_SVL_and_DAD_links_status(stackpair,retry=retry-1)
         return result
-
+    def update_interface_config_after_svl_formation(self,stackpair):
+        ''' Update links after SVL is formed to restore links config as was before SVL formation.'''
+        if not self.connect_to_stackpair(stackpair):
+            Logger.error("Could not connect to devices, Can not proceed.")
+            return False
+        #On Switch1
+        config1=self.testbed.devices[stackpair["switch1"]].dev_updated_config
+        config2=self.testbed.devices[stackpair["switch2"]].dev_updated_config
+        print(stackpair["status"])
+        try:
+            if stackpair['stackwiseVirtualDev'].is_connected():
+                stackpair['stackwiseVirtualDev'].configure(config1)
+                stackpair['stackwiseVirtualDev'].configure(config2)
+            else:
+                stackpair['stackwiseVirtualDev'].conect()
+                stackpair['stackwiseVirtualDev'].configure(config1)
+                stackpair['stackwiseVirtualDev'].configure(config2)
+            return True
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return False
     def check_stackwise_virtual_confgured(self,stackpair):
         '''
             USAGES: Validate if the device has stackwise-virtual config present on the stack devices or indivisul switches
@@ -898,7 +995,74 @@ class StackWiseVirtual(object):
             Logger.info("\nDefaulting the SVL Interface {}".format(cmd))
             oRtr.configure("interface {0} \n no stackwise-virtual dual-active-detection".format(cmd))
         return True
+#==========================================================
+#==========================================================
+def updateconfig_with_switch_number(dev_config, switchnumber, svltype = 9500):
+    ''' Update the config with switch number'''
+    dev_config_updated = ""
+    for line in dev_config.splitlines():
+        if 'source interface' in line:
+            continue
+        if "! " in line:
+            continue
+        if "interface " in line:
+            for interface in ["TenGigabitEthernet", "FortyGigabitEthernet", "TwentyFiveGigE","HundredGigabitEthernet", "HundredGigE",
+                                 "GigabitEthernet","Ethernet","Gig", "Ten", "Forty", "Hundred","Five"]:
+                if interface in line:
+                    interface_name = line.split()[1]
+                    interface_name = line.split()[1]
+                    new_interface_name = update_link_name(interface_name,switchnumber,svltype)
+                    line = line.replace(interface_name, new_interface_name)
+                    break
+        dev_config_updated = dev_config_updated + line + "\n"
+    print(dev_config_updated)
+    return dev_config_updated
 
+def update_link_name(interface_name, switchnumber, svltype):
+    ''' Update the link name with switch number'''
+    new_interface_name = interface_name
+    if svltype in [9600, 9400, '9600', '9400']:
+        a=re.findall("([a-zA-Z]+)\s*(\d+\S+)",interface_name)
+        if a[0][1][0] != '0':
+            new_interface_name = a[0][0]+str(switchnumber)+"/"+a[0][1]
+        else:
+            new_interface_name = interface_name
+    elif svltype in [9500, '9500']:
+        a=re.findall("([a-zA-Z]+)\s*(\d+\S+)",interface_name)
+        b=a[0][1].split("/")
+        if int(b[0]) != 0:
+            b[0]=str(switchnumber)
+        intf_numb= '/'.join(b)
+        new_interface_name = a[0][0]+intf_numb
+    else:
+        Logger.error("Invalid SVL Type")
+    #print(new_interface_name)
+    return new_interface_name
+
+def collect_isis_configured_interface_configs(configoutput, switchnumber, svltype):
+    ''' Collect the isis configured interface configs
+        interface TwentyFiveGigE1/0/30
+        !
+        interface TwentyFiveGigE1/0/31
+        description Fabric Physical Link
+        no switchport
+        dampening
+        ip address 204.101.48.44 255.255.255.254
+        no ip redirects
+        ip pim sparse-mode
+        ip router isis 
+        load-interval 30
+        bfd interval 250 min_rx 250 multiplier 3
+        clns mtu 1400
+        isis network point-to-point 
+        !
+        interface TwentyFiveGigE1/0/32
+    '''
+    pattern = '(interface\s+\S+\s*[\n\r][^\/]+isis network point-to-point)[^\/]+interface'
+    isislinks = re.findall(pattern, configoutput)
+    isislinksConfig = "\n".join(isislinks)
+    updated_config = updateconfig_with_switch_number(isislinksConfig, switchnumber, svltype)
+    return updated_config
 #==========================================================
 #   sub name: reload device asynchronously so both switches reload in parallel
 #   Return: pass/fail (1/0)
