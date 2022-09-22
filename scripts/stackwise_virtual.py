@@ -135,7 +135,7 @@ class svlformation_and_validation(aetest.Testcase):
         else:
             self.passed("Stackwise Virtual configurations are success.")
     @aetest.test
-    def update_interface_config_after_svl_formation(self,svl_handle):
+    def remove_interface_config_eem_config_after_svl(self,svl_handle):
         '''
             This is a post check to update the interface config on the switches after SVL formation.
         '''
@@ -143,7 +143,7 @@ class svlformation_and_validation(aetest.Testcase):
         result=True
         for stackpair in svl_handle.device_pair_list:
             with steps.start("Update interface config after SVL formation",continue_= True) as step:
-                if not svl_handle.update_interface_config_after_svl_formation(stackpair):
+                if not svl_handle.remove_interface_config_eem_config_after_svl_formation(stackpair):
                     result=False
                     step.failed("Update interface config after SVL formation failed for stackwise virtual pair :{}".format(stackpair))
         if not result:

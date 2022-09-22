@@ -306,30 +306,64 @@ class StackWiseVirtual(object):
         ''' Get the switch Interface configs config before performing SVL'''
         self.get_device_config_before_svl(stackpair["switch1"])
         self.get_device_config_before_svl(stackpair["switch2"])
+        self.get_svl_links(stackpair)
         self.testbed.devices[stackpair["switch1"]].dev_updated_config = \
                                         collect_isis_configured_interface_configs( 
                                             self.testbed.devices[stackpair["switch1"]].config_before_svl, 1,
-                                            stackpair['pairinfo']["platformType"])
+                                            stackpair['pairinfo']["platformType"],
+                                            self.testbed.devices[stackpair["switch1"]].svl_links)
         self.testbed.devices[stackpair["switch2"]].dev_updated_config  = \
                                         collect_isis_configured_interface_configs( 
                                             self.testbed.devices[stackpair["switch2"]].config_before_svl, 2,
-                                            stackpair['pairinfo']["platformType"])
+                                            stackpair['pairinfo']["platformType"],
+                                            self.testbed.devices[stackpair["switch2"]].svl_links)
         print(self.generate_eem_configs_from_old_interface_configs(stackpair))
+        return True
+    def get_svl_links(self, stackpair):
+        ''' Get the switch Interface configs config before performing SVL'''
+        switch1_links=[]
+        switch2_links=[]
+        for link in self.testbed.devices[stackpair["switch1"]]:
+            if self.testbed.devices[stackpair["switch2"]] in link.remote_devices and \
+                (link.link.name.upper().find('STACKWISEVIRTUAL-LINK') != -1 
+                 or link.link.name.upper().find('DAD-LINK') != -1 ):
+                switch1_links.append(link.name..strip())
+        self.testbed.devices[stackpair["switch1"]].svl_links = switch1_links
+        for link in self.testbed.devices[stackpair["switch2"]]:
+            if self.testbed.devices[stackpair["switch1"]] in link.remote_devices and \
+                (link.link.name.upper().find('STACKWISEVIRTUAL-LINK') != -1 
+                 or link.link.name.upper().find('DAD-LINK') != -1 ):
+                switch2_links.append(link.name.strip())
+        self.testbed.devices[stackpair["switch2"]].svl_links = switch2_links
+        if len(switch1_links) != len(switch2_links):
+            Logger.error("Testbed File Validation Error: The number of SVL links {} and {} does not match".format(
+                                        len(switch1_links),len(switch2_links)))
+            raise
+        if len(switch1_links) == 0:
+            Logger.error("Testbed File Validation Error: No SVL links found in the testbed file")
+            raise
         return True
     def generate_eem_configs_from_old_interface_configs(self, stackpair):
         ''' Generate EEM configs from old interface configs'''
         eem_config = \
             """event manager applet STACKMGR_FORMATION authorization bypass
                 event syslog pattern \"DMI-5-SYNC_COMPLETE: Chassis 2 R0/0\"
-                action 1.0 syslog msg \"Updating interace configs for SVL with new link numbers\"
-                action 2.0 cli command \"configure terminal\"
+                action 0001 syslog msg \"Updating interace configs for SVL with new link numbers\"
+                action 0002 cli command \"enable\"
+                action 0003 cli command \"configure terminal\"
             """
-        counter =3
+        counter = 4
         for line in self.testbed.devices[stackpair["switch1"]].dev_updated_config.split('\n'):
-            eem_config += f"action {counter}.0 cli command \"{line}\"\n"
+            if line.strip() == "":
+                continue
+            cstr = str(counter).zfill(4)
+            eem_config += f"action {cstr} cli command \"{line.strip() }\"\n"
             counter +=1
         for line in self.testbed.devices[stackpair["switch2"]].dev_updated_config.split('\n'):
-            eem_config += f"action {counter}.0 cli command \"{line}\"\n"
+            if line.strip() == "":
+                continue
+            cstr = str(counter).zfill(4)
+            eem_config += f"action {cstr} cli command \"{line.strip() }\"\n"
             counter +=1
         self.testbed.devices[stackpair["switch1"]].eem_config = eem_config
         self.testbed.devices[stackpair["switch2"]].eem_config = eem_config
@@ -503,12 +537,9 @@ class StackWiseVirtual(object):
         stackstatus = re.findall('Stackwise Virtual : Enabled',output1)
         result=False
         if stackstatus:
-            output2 = output.split("\n")
-            for line in output2:
-                stackstatus1 = re.findall('\d[\s\t]+\d[\s\t]+[\w/]+[\s\t]+[\w/]+',line)
-                if stackstatus1:
-                    result = True
-                    break
+            stackstatus1 = re.findall('(\d+[\s\t]+\S+\s+\S+[\s\t]+\n)',output1)
+            if stackstatus1:
+                result = True
             print(result)
         if not result and retry > 0:
             time.sleep(sleep)
@@ -908,6 +939,17 @@ class StackWiseVirtual(object):
             print(e)
             traceback.print_exc()
             return False
+    def remove_interface_config_eem_config_after_svl_formation(self,stackpair):
+        if not self.connect_to_stackpair(stackpair):
+            Logger.error("Could not connect to devices, Can not proceed.")
+            return False
+        try:
+            stackpair['stackwiseVirtualDev'].configure("no event manager applet STACKMGR_FORMATION authorization bypass")
+            return True
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return False
     def check_stackwise_virtual_confgured(self,stackpair):
         '''
             USAGES: Validate if the device has stackwise-virtual config present on the stack devices or indivisul switches
@@ -1039,7 +1081,7 @@ def update_link_name(interface_name, switchnumber, svltype):
     #print(new_interface_name)
     return new_interface_name
 
-def collect_isis_configured_interface_configs(configoutput, switchnumber, svltype):
+def collect_isis_configured_interface_configs(configoutput, switchnumber, svltype, svl_links=[]):
     ''' Collect the isis configured interface configs
         interface TwentyFiveGigE1/0/30
         !
@@ -1060,6 +1102,10 @@ def collect_isis_configured_interface_configs(configoutput, switchnumber, svltyp
     '''
     pattern = '(interface\s+\S+\s*[\n\r][^\/]+isis network point-to-point)[^\/]+interface'
     isislinks = re.findall(pattern, configoutput)
+    for link in isislinks:
+        for svl_link in svl_links:
+            if svl_link in link:
+                isislinks.remove(link)
     isislinksConfig = "\n".join(isislinks)
     updated_config = updateconfig_with_switch_number(isislinksConfig, switchnumber, svltype)
     return updated_config
