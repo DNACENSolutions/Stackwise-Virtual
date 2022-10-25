@@ -1,5 +1,6 @@
 #Stackwise vitual Class. Models two switches as one HA device.
 from distutils.errors import LinkError
+from distutils.log import Log
 from threading import Thread
 from pyats.topology import loader
 import logging
@@ -294,12 +295,14 @@ class StackWiseVirtual(object):
         output=self.testbed.devices[dev].execute("show version")
         version = re.findall("Cisco IOS XE Software, Version\s+(\S+)",str(output))[0]
         model_number = re.findall("Model Number\s+:\s+(\S+)",str(output))[0]
+        Logger.info("Device {} has version {} and model number {}".format(dev,version,model_number))
         return dict(version=version,model=model_number)
 
     def get_device_config_before_svl(self, dev):
         ''' Get the switch Interface configs config before performing SVL'''
         output=self.testbed.devices[dev].execute("show running-config | sec interface")
         self.testbed.devices[dev].config_before_svl = output
+        Logger.info("Config before SVL {} on device {}".format(output,dev))
         return output
     
     def update_device_config_with_new_link_numbers(self, stackpair):
@@ -327,7 +330,7 @@ class StackWiseVirtual(object):
             if self.testbed.devices[stackpair["switch2"]] in link.remote_devices and \
                 (link.link.name.upper().find('STACKWISEVIRTUAL-LINK') != -1 
                  or link.link.name.upper().find('DAD-LINK') != -1 ):
-                switch1_links.append(link.name..strip())
+                switch1_links.append(link.name.strip())
         self.testbed.devices[stackpair["switch1"]].svl_links = switch1_links
         for link in self.testbed.devices[stackpair["switch2"]]:
             if self.testbed.devices[stackpair["switch1"]] in link.remote_devices and \
@@ -335,6 +338,8 @@ class StackWiseVirtual(object):
                  or link.link.name.upper().find('DAD-LINK') != -1 ):
                 switch2_links.append(link.name.strip())
         self.testbed.devices[stackpair["switch2"]].svl_links = switch2_links
+        Logger.info("Switch1 {} links {}".format(stackpair["switch1"],switch1_links))
+        Logger.info("Switch2 {} links {}".format(stackpair["switch2"],switch2_links))
         if len(switch1_links) != len(switch2_links):
             Logger.error("Testbed File Validation Error: The number of SVL links {} and {} does not match".format(
                                         len(switch1_links),len(switch2_links)))
@@ -347,7 +352,7 @@ class StackWiseVirtual(object):
         ''' Generate EEM configs from old interface configs'''
         eem_config = \
             """event manager applet STACKMGR_FORMATION authorization bypass
-                event syslog pattern \"DMI-5-SYNC_COMPLETE: Chassis 2 R0/0\"
+                event syslog pattern \"DMI-5-SYNC_COMPLETE: Chassis\"
                 action 0001 syslog msg \"Updating interace configs for SVL with new link numbers\"
                 action 0002 cli command \"enable\"
                 action 0003 cli command \"configure terminal\"
@@ -359,12 +364,16 @@ class StackWiseVirtual(object):
             cstr = str(counter).zfill(4)
             eem_config += f"action {cstr} cli command \"{line.strip() }\"\n"
             counter +=1
+        #Skipping this section for now, due to up link config getting deleted when SVL is performed and 
+        #Switch 2 is deleted from DNAC
+        '''
         for line in self.testbed.devices[stackpair["switch2"]].dev_updated_config.split('\n'):
             if line.strip() == "":
                 continue
             cstr = str(counter).zfill(4)
             eem_config += f"action {cstr} cli command \"{line.strip() }\"\n"
             counter +=1
+        '''
         self.testbed.devices[stackpair["switch1"]].eem_config = eem_config
         self.testbed.devices[stackpair["switch2"]].eem_config = eem_config
         return eem_config

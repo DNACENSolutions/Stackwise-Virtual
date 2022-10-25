@@ -45,6 +45,8 @@ devices:
     tacacs: '%{testbed.tacacs}'
     passwords: '%{testbed.passwords}'
     connections:
+      defaults:
+        class: unicon.Unicon
       a:
         protocol: ssh
         ip: 10.195.243.102
