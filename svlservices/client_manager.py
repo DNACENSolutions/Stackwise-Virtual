@@ -1163,6 +1163,7 @@ class SVLFormation(object):
                 "protocol": "ssh",
                 "ip": self.devinfo[list(self.devinfo.keys())[counter]]['managementIpAddress'],
                 "port": 22,
+                "ssh_options": " -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null",
                "arguments": {
                     "learn_hostname": "true"}
             }
@@ -1256,8 +1257,12 @@ class SVLFormation(object):
 #main function
 if __name__ == '__main__':
     #Initiate the client
-    if len(sys.argv) > 1 and sys.argv[1] == "help" or sys.argv[1] == "-h" or sys.argv[1] == "--help" or sys.argv[1] == "-help" or sys.argv[1] == "--h" or sys.argv[1] == "?":
-        print("\nUsage: python3 ./svlservices/client_manager.py <cluster_ip> <username> <password> <device1_ip> <device2_ip> <device_user> <device_pass> <device_enable_pass>\n")
+    if len(sys.argv) > 1 and (sys.argv[1] == "help" or sys.argv[1] == "-h" or \
+        sys.argv[1] == "--help" or sys.argv[1] == "-help" or sys.argv[1] == "--h" or \
+            sys.argv[1] == "?"):
+        print("\nUsage: python3 ./svlservices/client_manager.py <cluster_ip> "+
+              "<username> <password> <device1_ip> <device2_ip> <device_user> "+
+              "<device_pass> <device_enable_pass>\n")
         exit()
     elif len(sys.argv) == 9:
         clusterip = sys.argv[1] 
@@ -1410,7 +1415,14 @@ if __name__ == '__main__':
         logger.error("SVL Formation failed")
     else:
         logger.info("SVL Formation passed")
+    for stackpair in svl_handle.device_pair_list:
+        primary_ip = str(stackpair['stackwiseVirtualDev'].connections['a'].ip)
+        secondary_ip = device1_ip if primary_ip == device2_ip else device2_ip
+        if result:
+            client.delete_device_from_inventory(client.devinfo[secondary_ip]['id'], clean_config=False)
+            print(client.force_sync(client.devinfo[primary_ip]['id']))
     if result:
-        client.delete_device_from_inventory(client.devinfo[client.device2_ip]['id'], clean_config=False)
-        print(client.force_sync(client.devinfo[client.device1_ip]['id']))
-    print("SVL Formation passed")
+        logger.info("SVL Formation passed")
+    else:
+        logger.error("SVL Formation failed")
+    print("SVL Formation Completed")

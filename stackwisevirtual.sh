@@ -38,15 +38,15 @@ while getopts ":h:i:c:u:d:" option; do
         ./setup.sh
         exit;;
       c) #Launch create job
-         source "./pyatsenv/bin/activate"
+         #source "./pyatsenv/bin/activate"
          pyats run job ./job/svl_job.py --testbed $OPTARG
          exit;;
       u) #Launch update job
-         source "./pyatsenv/bin/activate"
+         #source "./pyatsenv/bin/activate"
          pyats run job ./job/svl_update_job.py --testbed $OPTARG
          exit;;
       d) #Launch destroy job
-         source "./pyatsenv/bin/activate"
+         #source "./pyatsenv/bin/activate"
          pyats run job ./job/svl_remove_job.py --testbed $OPTARG
          exit;;
       \?) # Invalid option
