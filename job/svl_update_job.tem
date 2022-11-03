@@ -1,0 +1,35 @@
+# Copyright (c) 2022 by Cisco Systems, Inc.
+# All rights reserved.
+# Standard author information:
+
+version: 1
+name : svlupdate
+type: easypy
+
+arguments:
+    no-mail: True
+
+runtimes:
+    venv:
+        type: virtualenv
+        source:
+            - /pyats/source/bin/activate
+        environment:
+            PYTHONPATH: .
+
+profiles:
+    sol-test:
+        description: |
+            "sol-test profile for SVL update"
+        runtime: venv
+        arguments:
+            mail-html: False
+            testbed-file: /pyats/Stackwise-Virtual/testbed/9600_sv_tb.yaml
+            clean-file: None
+            invoke-clean: False
+            health-checks:
+                - cpu
+                - memory
+                - logging
+                - core
+
