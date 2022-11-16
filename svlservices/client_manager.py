@@ -6,6 +6,7 @@ import yaml
 import importlib
 import time
 import logging
+import ipaddress
 import re
 import pprint
 import traceback
@@ -616,11 +617,40 @@ class SVLFormation(object):
         self.device_user = device_user
         self.device_pass = device_pass
         self.device_enable_pass = device_enable_pass
-        self.log = logging.getLogger(__name__)
+        self.log = logger
         self.log.info("SVL Formation Started for devices {} and {}".format(self.device1_ip,self.device2_ip))
-        self.dnac = ApicemClientManager(self.dnac_ip, self.dnac_user, self.dnac_pass)
         self.device1['ip'] = self.device1_ip
         self.device2['ip'] = self.device2_ip
+        if self.validate_input():
+            self.dnac = ApicemClientManager(self.dnac_ip, self.dnac_user, self.dnac_pass)
+        
+    def validate_input(self):
+        ''' Validate input parameters '''
+        if not self.dnac_ip or not self.dnac_user or not self.dnac_pass:
+            self.log.error("DNAC IP, Username and Password are mandatory")
+            return False
+        if not self.device1_ip or not self.device2_ip:
+            self.log.error("Device1 and Device2 IP are mandatory")
+            return False
+        if not self.device_user or not self.device_pass or not self.device_enable_pass:
+            self.log.error("Device Username, Password and Enable Password are mandatory")
+            return False
+        print("DNAC IP: ", self.dnac_ip)
+        if not self.is_valid_ip(self.dnac_ip):
+            print("Invalid DNAC IP address: {}".format(self.dnac_ip))
+            return False
+        print("DNAC Username: ", self.dnac_user)
+        #print("clusteradminpass: ", clusteradminpass)
+        print("SWITCH1 IP: ", self.device1_ip)
+        if not self.is_valid_ip(self.device1_ip):
+            print("Invalid SWITCH1 IP address: {}".format(self.device1_ip))
+            return False
+        print("SWITCH2 IP: ", self.device2_ip)
+        if not self.is_valid_ip(self.device2_ip):
+            print("Invalid SWITCH2 IP address: {}".format(self.device2_ip))
+            return False
+        print("Device User ID: ", self.device_user)
+        return True
     def get_interface_info(self, deviceid, name, attribute='id'):
         """Find the device ID of the device in the inventory by name"""
         params={'name' : name}
@@ -1253,7 +1283,14 @@ class SVLFormation(object):
         else:
             self.log.info("Device sync is Success")
             return True
-
+    #Validate a given string is a valid IP address
+    def is_valid_ip(self, ip):
+        try:
+            ipaddress.ip_address(ip)
+            return True
+        except ValueError:
+            self.log.error("Invalid IP address: {}".format(ip))
+            return False
 #main function
 if __name__ == '__main__':
     #Initiate the client
@@ -1282,41 +1319,50 @@ if __name__ == '__main__':
         deviceuser = input("Enter the SVL switch username: ")
         devicepass = getpass.getpass("Enter the SVL switch password: ")
         deviceenablepass = getpass.getpass("Enter the SVL switch enable password: ")
-    print("clusterip: ", clusterip)
-    print("clusteradmin: ", clusteradmin)
-    print("clusteradminpass: ", clusteradminpass)
-    print("device1_ip: ", device1_ip)
-    print("device2_ip: ", device2_ip)
-    print("deviceuser: ", deviceuser)
-    print("devicepass: ", devicepass)
-    print("deviceenablepass: ", deviceenablepass)
+    #Validate Valid ipv4 address for cluster ip
+    #print("devicepass: ", devicepass)
+    #print("deviceenablepass: ", deviceenablepass)
     client = SVLFormation(clusterip, clusteradmin, clusteradminpass,
                           device1_ip, device2_ip, deviceuser, 
                           devicepass,deviceenablepass
                           )
-    logger.info("Network device info")
-    if not client.collect_device_info():
-        client.log.error("Failed to get device info, Both devices are not yet available in DNAC")
+    if not client.validate_input():
+        exit()
+    print("Collecting Network devices info from DNAC Inventory")
+    try:
+        if not client.collect_device_info():
+            print(" !!!! ERROR: Failed to get device info, Both devices are not yet available in DNAC !!!!")
+            sys.exit(1)
+    except Exception as e:
+        print(" !!!! ERROR: Failed to get device info, Both devices are not yet available in DNAC.\n"+\
+                         "Run utility when devices are learned in DNAC through LAN Automation. !!!")
         sys.exit(1)
-    '''
-    '''
-    client.collect_device_info()
+    print("\n**** Collecting Network devices info from DNAC Inventory is Success ****\n")
     if client.update_hostname():
-        logger.info("Hostname updated successfully")
+        print("**** Hostname updated successfully ****")
     else:
-        logger.error("Failed to update hostname")
+        print("!!!  Failed to update hostname !!!")
         sys.exit(1)
-    print(client.get_both_switches_cdp_data())
+    try:
+        print(client.get_both_switches_cdp_data())
+    except Exception as e:
+        print(" !!!! ERROR Failed to get CDP data from both switches. !!!! ")
+        sys.exit(1)
     if len(list(client.devinfo.keys())) != 2:
-        logger.error("Both devices are not yet available in DNAC")
-        logger.error("Run the utility only when both SVL switches are in DNAC")
+        print(" !!!! ERROR: Both devices are not yet available in DNAC !!!!")
+        print(" !!!! ERROR Run the utility only when both SVL switches are in DNAC !!!!")
         sys.exit(1)
     else:
-        logger.info("Both devices are available in DNAC")
-    client.generate_cdp_data()
-    pprint.pprint(client.update_testbed_file())
+        print("**** Both devices are available in DNAC **** ")
+    try:
+        client.generate_cdp_data()
+        client.update_testbed_file()
+    except Exception as e:
+        client.log.error("Failed to generate CDP data")
+        sys.exit(1)
+    #pprint.pprint(client.update_testbed_file())
     #get user input id to continue or not
-    uinput = input("Do you want to continue with the testbed file update? (y/n): ")
+    #uinput = input("Do you want to continue with the testbed file update? (y/n): ")
     testbed = loader.load(tb_file)
     svl_handle = StackWiseVirtual(testbed)
     logger.info(svl_handle)
@@ -1324,105 +1370,108 @@ if __name__ == '__main__':
     result = True
     for stackpair in svl_handle.device_pair_list:
         if not svl_handle.check_links(stackpair):
-            logger.error("The devices provided to be paired into SVL does not have any links connected to each others")
+            print("!!! ERROR: The devices provided to be paired into SVL does not have any links connected to each others !!!")
             result=False
     if not result:
-        logger.error("The devices provided to be paired into SVL does not have correct links connected to each others")
+        print("!!!! ERROR: The devices provided to be paired into SVL does not have correct links connected to each others !!!!")
         sys.exit(1)
     else:
-        logger.info("The devices provided to be paired into SVL have correct links connected to each others")
+        print("The devices provided to be paired into SVL have correct links connected to each others")
     for stackpair in svl_handle.device_pair_list:
         if not svl_handle.connect_to_stackpair(stackpair):
             result=False
-            logger.error("Could not connect to devices, Can not proceed. for stackwise virtual pair :{}".format(stackpair))
+            print("!!!! Could not connect to devices, Can not proceed. for stackwise virtual pair :{} !!!!".format(stackpair))
     if not result:
-        logger.error("Could not connect to devices, Can not proceed.")
+        print("!!!! Could not connect to devices, Can not proceed.!!!!")
         sys.exit(1)
     else:
-        logger.info("Connected to devices")
+        print("Connected to devices")
     for stackpair in svl_handle.device_pair_list:
         if not svl_handle.check_min_version_req(stackpair):
             result=False
-            logger.error("Existing SVL Check/Minimum Version/Stack status failed for switchpair:{}, fix it before moving further".format(stackpair))
+            print("Existing SVL Check/Minimum Version/Stack status failed for switchpair:{}, fix it before moving further".format(stackpair))
         else:
-            logger.info("Existing SVL Check/Minimum Version/Stack status passed for switchpair:{}".format(stackpair))
+            print("Existing SVL Check/Minimum Version/Stack status passed for switchpair:{}".format(stackpair))
     if not result:
-        logger.error("Existing SVL Check/Minimum Version/Stack status failed, fix it before moving further")
+        print("Existing SVL Check/Minimum Version/Stack status failed, fix it before moving further")
         sys.exit(1)
     else:
-        logger.info("Existing SVL Check/Minimum Version/Stack status passed")
+        print("Existing SVL Check/Minimum Version/Stack status passed")
     for stackpair in svl_handle.device_pair_list:
         if not svl_handle.configure_svl_step1(stackpair):
             result=False
-            logger.error("Step1 Configure the step 1 config, switch number and domain configs on switches, failed")
+            print("Step1 Configure the step 1 config, switch number and domain configs on switches, failed")
         else:
-            logger.info("Step1 Configure the step 1 config, switch number and domain configs on switches, passed")
+            print("Step1 Configure the step 1 config, switch number and domain configs on switches, passed")
         if not svl_handle.configure_svl_step2_svllinkconfig(stackpair):
             result=False
-            logger.error("Step2 Config stackwise Virtual links on switches, failed.")
+            print("Step2 Config stackwise Virtual links on switches, failed.")
         else:
-            logger.info("Step2 Config stackwise Virtual links on switches, passed.")
+            print("Step2 Config stackwise Virtual links on switches, passed.")
         if not svl_handle.connect_to_stackpair(stackpair):
             result=False
-            logger.error("Could not connect to devices, Can not proceed. for stackwise virtual pair :{}".format(stackpair))
+            print("Could not connect to devices, Can not proceed. for stackwise virtual pair :{}".format(stackpair))
         else:
-            logger.info("Connected to devices")
+            print("Connected to devices")
             
         if not svl_handle.configure_svl_step3_dad_linkconfig(stackpair):
             result=False
-            logger.error("Step3 Configuring stackwise Virtual Dual Active Detection Links, failed.")
+            print("Step3 Configuring stackwise Virtual Dual Active Detection Links, failed.")
         else:
-            logger.info("Step3 Configuring stackwise Virtual Dual Active Detection Links, passed.")
+            print("Step3 Configuring stackwise Virtual Dual Active Detection Links, passed.")
         svl_handle.update_device_config_with_new_link_numbers(stackpair)
         svl_handle.configure_updated_config_in_the_switches(stackpair)
         if not svl_handle.save_config_and_reload(stackpair,reloadAsync=True):
             result=False
-            logger.error("Step6 Save config and reload the switches, failed.")
+            print("Step6 Save config and reload the switches, failed.")
         else:
-            logger.info("Step6 Save config and reload the switches, passed.")
+            print("Step6 Save config and reload the switches, passed.")
     if not result:
-        logger.error("SVL Formation failed")
+        print("SVL Formation failed")
         sys.exit(1)
     else:
-        logger.info("SVL Formation passed")
+        print("SVL Formation passed")
     for stackpair in svl_handle.device_pair_list:
         if not svl_handle.remove_interface_config_eem_config_after_svl_formation(stackpair):
             result=False
-            logger.error("Update interface config after SVL formation failed for stackwise virtual pair :{}".format(stackpair))
+            print("Update interface config after SVL formation failed for stackwise virtual pair :{}".format(stackpair))
         else:
-            logger.info("Update interface config after SVL formation passed for stackwise virtual pair :{}".format(stackpair))
+            print("Update interface config after SVL formation passed for stackwise virtual pair :{}".format(stackpair))
     if not result:
-        logger.error("SVL Formation failed")
+        print("SVL Formation failed")
     else:
-        logger.info("SVL Formation passed")
+        print("SVL Formation passed")
     for stackpair in svl_handle.device_pair_list:
         if not svl_handle.check_stackwise_virtual_confgured(stackpair):
             result=False
-            logger.error("Stackwise Virtual configs are still present on one or both of the switches of stackpair: {}".format(stackpair))
+            print("Stackwise Virtual configs are still present on one or both of the switches of stackpair: {}".format(stackpair))
         else:
-            logger.info("Stackwise Virtual configs are removed from both of the switches of stackpair: {}".format(stackpair))
+            print("Stackwise Virtual configs are removed from both of the switches of stackpair: {}".format(stackpair))
     if not result:
-        logger.error("SVL Formation failed")
+        print("SVL Formation failed")
     else:
-        logger.info("SVL Formation passed")
+        print("SVL Formation passed")
     for stackpair in svl_handle.device_pair_list:
         if not svl_handle.validate_stackwise_SVL_and_DAD_links_status(stackpair):
             result=False
-            logger.error("Stackwise Virtual and DAD links are not up on one or both of the switches of stackpair: {}".format(stackpair))
+            print("Stackwise Virtual and DAD links are not up on one or both of the switches of stackpair: {}".format(stackpair))
         else:
-            logger.info("Stackwise Virtual and DAD links are up on both of the switches of stackpair: {}".format(stackpair))
+            print("Stackwise Virtual and DAD links are up on both of the switches of stackpair: {}".format(stackpair))
     if not result:
-        logger.error("SVL Formation failed")
+        print("SVL Formation failed")
     else:
-        logger.info("SVL Formation passed")
+        print("SVL Formation passed")
+    time.sleep(10)
     for stackpair in svl_handle.device_pair_list:
         primary_ip = str(stackpair['stackwiseVirtualDev'].connections['a'].ip)
         secondary_ip = device1_ip if primary_ip == device2_ip else device2_ip
         if result:
-            client.delete_device_from_inventory(client.devinfo[secondary_ip]['id'], clean_config=False)
+            print("Deleting the secondary device from DNAC so primary device can be synced")
+            if client.delete_device_from_inventory(client.devinfo[secondary_ip]['id'], clean_config=False):
+                print("Device {} deleted from DNAC".format(secondary_ip))
             print(client.force_sync(client.devinfo[primary_ip]['id']))
     if result:
-        logger.info("SVL Formation passed")
+        print("\n****  SVL Formation passed ****")
     else:
-        logger.error("SVL Formation failed")
+        print("\n!!!   SVL Formation failed !!!")
     print("SVL Formation Completed")

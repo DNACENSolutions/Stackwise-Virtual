@@ -352,7 +352,7 @@ class StackWiseVirtual(object):
         ''' Generate EEM configs from old interface configs'''
         eem_config = \
             """event manager applet STACKMGR_FORMATION authorization bypass
-                event syslog pattern \"DMI-5-SYNC_COMPLETE: Chassis\"
+                event syslog pattern \"Bulk Sync succeeded\"
                 action 0001 syslog msg \"Updating interace configs for SVL with new link numbers\"
                 action 0002 cli command \"enable\"
                 action 0003 cli command \"configure terminal\"
