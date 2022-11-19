@@ -632,6 +632,10 @@ class SVLFormation(object):
         if not self.device1_ip or not self.device2_ip:
             self.log.error("Device1 and Device2 IP are mandatory")
             return False
+        if self.device1_ip == self.device2_ip:
+            self.log.error("Device1 and Device2 IP cannot be same")
+            self.log.error("Device1 IP: {} and Device2 IP: {}".format(self.device1_ip,self.device2_ip))
+            return False
         if not self.device_user or not self.device_pass or not self.device_enable_pass:
             self.log.error("Device Username, Password and Enable Password are mandatory")
             return False
@@ -661,6 +665,45 @@ class SVLFormation(object):
         response = response['response']
         self.log.info(response)
         return response[attribute]
+    
+    def validate_switch1_switch2_version_and_model(self):
+        ''' Validate switch1 and switch2 version and model '''
+        device1 = self.devinfo[self.device1_ip]
+        device2= self.devinfo[self.device2_ip]
+        #matchfamily to "family": "Switches and Hubs"
+        if device1['family'] != "Switches and Hubs" or device2['family'] != "Switches and Hubs":
+            self.log.error("Device1 and Device2 should be switches")
+            self.log.error("Device1 Family: {} and Device2 Family: {}".format(device1['family'],device2['family']))
+            return False
+        if device1['softwareVersion'] != device2['softwareVersion']:
+            self.log.error("Switch1 and Switch2 version mismatch, not compatible for SVL formation")
+            self.log.error("Switch1 version: {} and Switch2 version: {}".format(device1['softwareVersion'],device2['softwareVersion']))
+            self.log.info("Upgrade both switches to same IOS software version and try again")
+            self.log.error("SVL Formation Failed")
+            return False
+        else:
+            self.log.info("Switch1 and Switch2 version are compatible for SVL formation")
+            self.log.info("Switch1 version: {} and Switch2 version: {}".format(device1['softwareVersion'],device2['softwareVersion']))
+        if device1['series'] != device2['series']:
+            self.log.error("Switch1 and Switch2 series mismatch")
+            self.log.error("Switch1 series: {} and Switch2 series: {}".format(device1['series'],device2['series']))
+            self.log.error("SVL Formation allowed only for same series switches")
+            self.log.error("SVL Formation Failed")
+            return False
+        else:
+            self.log.info("Switch1 and Switch2 series are compatible for SVL formation")
+            self.log.info("Switch1 series: {} and Switch2 series: {}".format(device1['series'],device2['series']))
+        #match type of both switches are same
+        if device1['type'] != device2['type']:
+            self.log.error("Switch1 and Switch2 type mismatch")
+            self.log.error("Switch1 type: {} and Switch2 type: {}".format(device1['type'],device2['type']))
+            self.log.error("SVL Formation allowed only for same type switches")
+            self.log.error("SVL Formation Failed")
+            return False
+        else:
+            self.log.info("Switch1 and Switch2 type are compatible for SVL formation")
+            self.log.info("Switch1 type: {} and Switch2 type: {}".format(device1['type'],device2['type']))
+        return True
     #==================================================================================================
     # (cfind_uuid_of_device )
     #--------------------------------------------------------------------------------------------------
@@ -1338,6 +1381,10 @@ if __name__ == '__main__':
                          "Run utility when devices are learned in DNAC through LAN Automation. !!!")
         sys.exit(1)
     print("\n**** Collecting Network devices info from DNAC Inventory is Success ****\n")
+    print("Checking if both switches are of same model and same version")
+    if not client.validate_switch1_switch2_version_and_model():
+        print(" !!!! ERROR: Both switches are not of same model and same version !!!")
+        sys.exit(1)
     if client.update_hostname():
         print("**** Hostname updated successfully ****")
     else:

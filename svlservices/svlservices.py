@@ -4,8 +4,10 @@ from distutils.log import Log
 from threading import Thread
 from pyats.topology import loader
 import logging
+import logging.handlers
 import re
 import time
+import os
 from copy import deepcopy
 from unicon.eal.dialogs import Statement, Dialog
 from pyats.topology import Device
@@ -32,7 +34,14 @@ SKIPCONLIST=[ 'defaults','alt', 'con_credentials']
 CONNECTIONKEYS=['a','b','c','d','e','f']
 SUPPORTED_PLATFORMS_LIST=[9500, 9400, 9600, "9500", "9400", "9600"] 
 #Logger initize
+handler = logging.handlers.WatchedFileHandler(
+    os.environ.get("LOGFILE", "./svl.log"))
+formatter = logging.Formatter(logging.BASIC_FORMAT)
+handler.setFormatter(formatter)
 Logger = logging.getLogger(__name__)
+Logger.setLevel(os.environ.get("LOGLEVEL", "INFO"))
+Logger.addHandler(handler)
+
 
 #================Device Interactive dialog confirmations for UNICON to provide cli user confirmations
 DIALOG_CONFIRM = Dialog([
@@ -78,15 +87,15 @@ def uni_connect(dev, retry=2, wait_sec=1, config_timeout=120):
             result = True
             break
         except ConnectionError as e:
-            logger.warning("Failed login through primary , trying clearing console and retry")
+            Logger.warning("Failed login through primary , trying clearing console and retry")
             try:
                 if dev.connections.a.protocol=="telnet":
                     uni_clear_console(dev)
                 dev.disconnect()
                 time.sleep(wait_sec)
             except:
-                logger.error(traceback.format_exc())
-                logger.info("clearing line for try:{}/{}".format(run+1, retry))
+                Logger.error(traceback.format_exc())
+                Logger.info("clearing line for try:{}/{}".format(run+1, retry))
                 if dev.connections.default.protocol=="telnet":
                     uni_clear_console(dev)
                 dev.disconnect()
@@ -134,10 +143,10 @@ def uni_clear_console(dev):
                     else:
                         uu.clear_line(term_serv, port)
                 else:
-                    logger.error("Dev: {} Unable to clear console: {}".
+                    Logger.error("Dev: {} Unable to clear console: {}".
                         format(dev.name, console))
             else:
-                logger.error("Dev: {} Unable to clear console: {}".
+                Logger.error("Dev: {} Unable to clear console: {}".
                     format(dev.name, console))
 
 def wait_for_reload_to_complete(timeout):
@@ -146,7 +155,9 @@ def wait_for_reload_to_complete(timeout):
         time.sleep(10)
         timePassed += 10
         Logger.info("Device reload is in progress, waiting for device to be ready to connect.")
+        print("Device reload is in progress, waiting for device to be ready to connect.")
     Logger.info("Device reload wait completed, connecting to device now.")
+    print("Device reload wait completed, connecting to device now.")
     return True
 
 #=========================Class/Functions===============
