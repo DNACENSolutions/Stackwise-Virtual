@@ -1211,6 +1211,7 @@ class SVLFormation(object):
                     topology += f"\t\t\t\tlink: eth-{devname}-{index1}-{interface['name']}-{index2}\n"
                 topology += "\t\t\t\ttype: ethernet\n"
             devlist.append(devname)
+            break
         #self.log.info(f"Below is the connection matrix that got generated with help of CDP Data:\n{topology}")
         #print(f"Below is the connection matrix that got generated with help of CDP Data:\n{topology}")
         pprint.pprint(topologydir)
