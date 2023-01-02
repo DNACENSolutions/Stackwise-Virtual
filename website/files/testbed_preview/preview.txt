@@ -3,11 +3,11 @@ testbed:
   tacacs:
     login_prompt: 'Username:'
     password_prompt: 'Password:'
-    username: sampleuser
+    username: xxxxxxx
   passwords:
-    tacacs: Sample#1223
-    enable: Cisco#123
-    line: Cisco#123
+    tacacs: xxxxxxxx
+    enable: xxxxxxx
+    line: xxxxxxx
   custom:
     switchstackinggroups:
     - numberofswitches: 2
@@ -31,8 +31,8 @@ devices:
         class: unicon.Unicon
       a:
         protocol: ssh
-        ip: 10.195.243.101
-        port: 22
+        ip: xx.xx.xx.xx
+        port: xxxx
         arguments:
           learn_hostname: true
   SWITCH-2:
@@ -47,8 +47,8 @@ devices:
     connections:
       a:
         protocol: ssh
-        ip: 10.195.243.102
-        port: 22
+        ip: xx.xx.xx.xx
+        port: xxxx
         arguments:
           learn_hostname: true
 topology:
