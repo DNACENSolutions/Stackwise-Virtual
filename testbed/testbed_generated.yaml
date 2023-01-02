@@ -5,8 +5,8 @@ devices:
       a:
         arguments:
           learn_hostname: 'true'
-        ip: 204.100.48.33
-        port: 22
+        ip: xx.xx.xx.xx
+        port: xx
         protocol: ssh
         ssh_options: ' -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
       defaults:
@@ -24,8 +24,8 @@ devices:
       a:
         arguments:
           learn_hostname: 'true'
-        ip: 204.100.48.34
-        port: 22
+        ip: xx.xx.xx.xx
+        port: xx
         protocol: ssh
         ssh_options: ' -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
       defaults:
@@ -48,13 +48,13 @@ testbed:
       - SWITCH-2
   name: STACKWISE-VIRTUAL
   passwords:
-    enable: Cisco#123
-    line: Cisco#123
-    tacacs: Lablab#123
+    enable: xxxxxxxx
+    line: xxxxxxxx
+    tacacs: xxxxxxxx
   tacacs:
     login_prompt: 'Username:'
     password_prompt: 'Password:'
-    username: wlcaccess
+    username: xxxxxxxx
 topology:
   SWITCH-1:
     interfaces:
