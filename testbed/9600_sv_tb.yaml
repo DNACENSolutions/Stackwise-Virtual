@@ -5,11 +5,11 @@ testbed:
     tacacs:
         login_prompt: "Username:"
         password_prompt: "Password:"
-        username: wlcaccess
+        username: sampleuserjunk
     passwords:
-        tacacs: Lablab#123
-        enable: Cisco#123
-        line: Cisco#123
+        tacacs: samplepasswordjunk
+        enable: samplepasswordjunk
+        line: samplepasswordjunk
     #Details to form stackwise virtual Paris. leave it ok with default.
     #platformType should be 9500 for all 9500/9500H platform.
     #platformType should be 9600 for all 9600 based platform.
@@ -44,19 +44,10 @@ devices:
             a:
                 #Device Console Access Primary RP. Always have learn_hostname: True
                 protocol: telnet
-                #protocol: ssh
-                #ip: 10.195.243.101
-                ip: 172.21.236.76
+                ip: xx.xx.xx.xx
                 port: 2003
                 arguments:
                     learn_hostname: True
-            #if it is a dual RP device Define the second console under b:
-            #b:
-            #    protocol: telnet
-            #    ip: 172.21.236.76
-            #    port: 2003
-            #    arguments:
-            #        learn_hostname: True
     #Switch2 Details.
     SWITCH-2:
         os: 'iosxe'
@@ -70,10 +61,8 @@ devices:
         connections:
             a:
                 protocol: telnet
-                ip: 172.21.236.76
+                ip: xx.xx.xx.xx
                 port: 2004
-                #protocol: ssh
-                #ip: 10.195.243.102
                 arguments:
                     learn_hostname: True
 #Topology Section
