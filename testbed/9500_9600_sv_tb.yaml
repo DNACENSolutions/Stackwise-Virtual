@@ -5,11 +5,11 @@ testbed:
     tacacs:
         login_prompt: "Username:"
         password_prompt: "Password:"
-        username: sampleuser
+        username: sampleuserjunk
     passwords:
-        tacacs: Sample#1223
-        enable: Cisco#123
-        line: Cisco#123
+        tacacs: Sample#1223junk
+        enable: Sample#1223junk
+        line: Sample#1223junk
     #Details to form stackwise virtual Paris. leave it ok with default.
     #platformType should be 9500 for all 9500/9500H platform.
     #platformType should be 9600 for all 9600 based platform.
@@ -50,15 +50,15 @@ devices:
             a:
                 #Device Console Access Primary RP. Always have learn_hostname: True
                 protocol: telnet
-                ip: 172.21.236.76
-                port: 2003
+                ip: xx.xx.xx.xx
+                port: xxxx
                 arguments:
                     learn_hostname: True
             #if it is a dual RP device Define the secon console under b:
             #b:
             #    protocol: telnet
-            #    ip: 172.21.236.76
-            #    port: 2003
+            #    ip: xx.xx.xx.xx
+            #    port: xxxx
             #    arguments:
             #        learn_hostname: True
     #Switch2 Details.
@@ -74,8 +74,8 @@ devices:
         connections:
             a:
                 protocol: telnet
-                ip: 172.21.236.76
-                port: 2004
+                ip: xx.xx.xx.xx
+                port: xxxx
                 arguments:
                     learn_hostname: True
 
@@ -93,8 +93,8 @@ devices:
             defaults: {class: 'unicon.Unicon'}
             a:
                 protocol: telnet
-                ip: 10.195.243.21
-                port: 2048
+                ip: xx.xx.xx.xx
+                port: xxxx
             con_credentials:
                 terminal_server_username: tsusername
                 terminal_server_password: tspassword
@@ -111,8 +111,8 @@ devices:
         connections:
             a:
                 protocol: telnet
-                ip: 10.195.243.21
-                port: 2033
+                ip: xx.xx.xx.xx
+                port: xxxx
             con_credentials:
                 terminal_server_username: tsusername
                 terminal_server_password: tspassword
