@@ -5,8 +5,8 @@ devices:
       a:
         arguments:
           learn_hostname: true
-        ip: 172.21.236.76
-        port: 2003
+        ip: xx.xx.xx.xx
+        port: xxxx
         protocol: telnet
       defaults:
         class: unicon.Unicon
@@ -23,8 +23,8 @@ devices:
       a:
         arguments:
           learn_hostname: true
-        ip: 172.21.236.76
-        port: 2004
+        ip: xx.xx.xx.xx
+        port: xxxx
         protocol: telnet
     custom:
       switchnumber: '2'
@@ -44,13 +44,13 @@ testbed:
       - SWITCH-2
   name: STACKWISE-VIRTUAL
   passwords:
-    enable: Cisco
-    line: Cisco
-    tacacs: Sample#123
+    enable: xxxxxxx
+    line: xxxxxxx
+    tacacs: xxxxxxx
   tacacs:
     login_prompt: 'Username:'
     password_prompt: 'Password:'
-    username: sampleuser
+    username: xxxxxxx
 topology:
   SWITCH-1:
     interfaces:
